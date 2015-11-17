@@ -1,11 +1,14 @@
 #include <stdio.h>
 #include <stdlib.h>
 
-int printHeader(unsigned char*, int);
+#include "ethernetFrame.h"
+#include "printHeader.h"
+
+
 int getIpLen(unsigned char*, int);
 int getMessageType( unsigned char*, int);
 int getSequenceID(unsigned char*, int);
-int getEthernetHeader(FILE*);
+
 
 int main(void){
 	unsigned char buffer[40];
@@ -14,11 +17,11 @@ int main(void){
 	fread(buffer,sizeof(buffer), 1,file);
 	printHeader(buffer, sizeof(buffer));
 
+	struct ethernetFrame* frameName = malloc(14);
+	setEthernetHeader(file, frameName);	
+	free(frameName);
 
-	getEthernetHeader(file);	
-//	unsigned char ethernet[14];
-//	fread(ethernet, sizeof(ethernet), 1, file);
-//	printHeader(ethernet, 14);
+
 
 	unsigned char temp[1];
 	fread(temp, sizeof(temp), 1, file);
@@ -57,21 +60,6 @@ int main(void){
 	fclose(file);
 }
 
-int printHeader(unsigned char* buffer, int size){
-	printf("\n\n");
-	int i;
-        int count=0;
-        for(i = 0; i < size; i++){
-                printf("%02X ",buffer[i]);
-                if (count == 15){
-                        printf("\n");
-                        count = -1 ;
-                }
-                count++;
-        }
-	return 0;
-}
-
 
 int getIpLen(unsigned char* bits, int size){
 	unsigned char rightSide = bits[0] & 15;
@@ -99,12 +87,5 @@ int getSequenceID(unsigned char* bits, int size){
 	unsigned char leftSide = bits[0] & 15;
 	unsigned char rightSide = bits[1] >> 3;
 	return (32* leftSide + rightSide);
-}
-
-int getEthernetHeader(FILE* file){
-	unsigned char ethernet[14];
-	fread(ethernet, sizeof(ethernet), 1, file);
-	printHeader(ethernet, 14);
-	return 0;
 }
 
