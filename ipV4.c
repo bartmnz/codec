@@ -6,13 +6,13 @@
 
 
 void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size, unsigned char* first){
-//	unsigned char temp[1];
-//	fread(temp, sizeof(temp), 1, file);
-//	int sizeof_ip = getIpLen(temp, sizeof(temp));
+
+
+
 
 	if(size == 20){
 		unsigned char temp[2];
-	//	ipV4 = malloc(sizeof_ip);
+
 		ipv4Header->version[0] = first[0] & 240;
 		ipv4Header->headerLength[0] = first[0] & 15;
 		fread(ipv4Header->TOS, 1, 1, file);
@@ -29,8 +29,8 @@ void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size, unsigned ch
 		fread(ipv4Header->destinationAddress, 4, 1, file);
 		// if len > 20 fread(ipv4Header->options, len - 20 in bytes, 1, file);
 	}
-	printf("\n in IP land \n");
-	printHeader(ipv4Header->destinationAddress, 4);
+
+//	printHeader(ipv4Header->destinationAddress, 4);
 }
 
 int getIpLen(unsigned char* bits, int size){
