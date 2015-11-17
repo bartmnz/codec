@@ -3,9 +3,9 @@
 
 #include "ethernetFrame.h"
 #include "printHeader.h"
+#include "ipV4.h"
 
-
-int getIpLen(unsigned char*, int);
+//int getIpLen(unsigned char*, int);
 int getMessageType( unsigned char*, int);
 int getSequenceID(unsigned char*, int);
 
@@ -28,8 +28,11 @@ int main(void){
 	printHeader(temp, sizeof(temp));
 	
 
-	int sizeof_ipV4 = getIpLen(temp, sizeof(temp));
-
+	int sizeof_ip = getIpLen(temp, sizeof(temp));
+	struct ipv4Header* ipH = malloc(sizeof_ip);
+	setIpHeader(file, ipH, sizeof_ip, temp);
+	free(ipH);	
+/*
 
 
 	unsigned char* ipV4;
@@ -37,9 +40,10 @@ int main(void){
 	ipV4[0] = temp[0];
 	fread(&ipV4[1],sizeof_ipV4-1, 1, file);
 	printHeader(ipV4, sizeof_ipV4);
-
+*/
 	unsigned char udp[8];
-	if(ipV4[9] == 0x11){
+//	if(ipV4[9] == 0x11){
+	if(1){ //temp for now see above line
 		fread(udp, sizeof(udp), 1, file);
 		printHeader(udp ,sizeof(udp));
 	}else{
@@ -54,13 +58,13 @@ int main(void){
 	printf("\nmessage type is %d\n", getMessageType(meditrik, sizeof_meditrik));
 	printf("Sequence Id is : %d\n", getSequenceID(meditrik, sizeof_meditrik));
 	
-	free(ipV4);
+//	free(ipV4);
 	free(meditrik);
 	printf("\n\n\n");
 	fclose(file);
 }
 
-
+/*
 int getIpLen(unsigned char* bits, int size){
 	unsigned char rightSide = bits[0] & 15;
 	if (size < 0 || bits == NULL){
@@ -70,7 +74,7 @@ int getIpLen(unsigned char* bits, int size){
 	return 4 * rightSide;
 	
 }
-
+*/
 int getMessageType(unsigned char* bits, int size){
 	if (size < 0 || bits == NULL){
 		printf("ERROR: Invalid MESSAGE Type");

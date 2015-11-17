@@ -1,7 +1,7 @@
 CFLAGS= -std=c11 -Wall -Werror -Wextra -pedantic -Wno-deprecated  -Wstack-usage=1024 
 
 TARGET=project
-OBJS=project.o ethernetFrame.o printHeader.o
+OBJS=project.o ethernetFrame.o printHeader.o ipV4.o
 
 .PHONY: clean debug profile
 
