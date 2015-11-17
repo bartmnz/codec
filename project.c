@@ -5,6 +5,7 @@
 #include "printHeader.h"
 #include "ipV4.h"
 #include "udp.h"
+#include "meditrik.h"
 
 int getMessageType( unsigned char*, int);
 int getSequenceID(unsigned char*, int);
@@ -38,20 +39,23 @@ int main(void){
 		printf("ERROR: not utilizing UDP protocol\n");
 	}	
 	
-	unsigned char* meditrik;
-	int sizeof_meditrik = (udp->length[0]*256 + udp->length[1])-8;
-	meditrik = malloc(sizeof_meditrik);
-	fread(meditrik, sizeof_meditrik, 1, file);
-	printHeader(meditrik, sizeof_meditrik);
-	printf("\nmessage type is %d\n", getMessageType(meditrik, sizeof_meditrik));
-	printf("Sequence Id is : %d\n", getSequenceID(meditrik, sizeof_meditrik));
+	struct meditrik* medPtr = malloc(14);
+	setMeditrikHeader(file, medPtr);
+
+//	unsigned char* meditrik;
+//	int sizeof_meditrik = (udp->length[0]*256 + udp->length[1])-8;
+//	meditrik = malloc(sizeof_meditrik);
+//	fread(meditrik, sizeof_meditrik, 1, file);
+//	printHeader(meditrik, sizeof_meditrik);
+//	printf("\nmessage type is %d\n", getMessageType(meditrik, sizeof_meditrik));
+//	printf("Sequence Id is : %d\n", getSequenceID(meditrik, sizeof_meditrik));
 
 
-
+	free(medPtr);
 	free(udp);
 	free(frameName);
 	free(ipH);
-	free(meditrik);
+//	free(meditrik);
 	printf("\n\n\n");
 	fclose(file);
 }
