@@ -7,14 +7,14 @@
 #include "udp.h"
 #include "meditrik.h"
 
-int getMessageType( unsigned char*, int);
-int getSequenceID(unsigned char*, int);
+
+
 
 
 int main(void){
 	unsigned char buffer[40];
 	FILE* file;
-	file = fopen("hello.pcap", "rb");
+	file = fopen("gps.pcap", "rb");
 	fread(buffer,sizeof(buffer), 1,file);
 	printHeader(buffer, sizeof(buffer));
 
@@ -42,39 +42,53 @@ int main(void){
 	struct meditrik* medPtr = malloc(14);
 	setMeditrikHeader(file, medPtr);
 
-//	unsigned char* meditrik;
-//	int sizeof_meditrik = (udp->length[0]*256 + udp->length[1])-8;
-//	meditrik = malloc(sizeof_meditrik);
-//	fread(meditrik, sizeof_meditrik, 1, file);
-//	printHeader(meditrik, sizeof_meditrik);
-//	printf("\nmessage type is %d\n", getMessageType(meditrik, sizeof_meditrik));
-//	printf("Sequence Id is : %d\n", getSequenceID(meditrik, sizeof_meditrik));
+	struct statusPayload* stPtr;
+	struct commandPayload* cmdPtr;
+	struct gpsPayload* gpsPtr;
+	
+
+	if(medPtr->type == 0){
+		#define StatusMessage
+		stPtr = malloc(14);
+		setStatusPayload(file, stPtr);
+	}else if(medPtr->type == 1){
+		#define CommandInstruction
+		cmdPtr = malloc(4);
+		// set bool to  equal accurate value -- if has options params
+		setCommandPayload(file, cmdPtr, false);
+	}else if(medPtr->type == 2){
+		#define GpsInstruction
+		gpsPtr = malloc(20);
+		setGpsPayload(file, gpsPtr);
+	}else if(medPtr->type == 3){
+		#define MessageInstruction
+	//	struct messagePayload* msgPtr = malloc(//figure out size of message)
+	//	setmessagePayload(file, msgPtr);
+
+	}else{
+		// do something here because you have invalid input.
+	}
 
 
+
+	#ifdef StatusMessage 
+		free(stPtr);
+	#elif defined CommandInstruction
+		free(cmdPtr);
+	#elif defined GpsInstruction
+		free(gpsPtr);
+	#elif defined MessageInstruction
+		free(msgPtr);
+	#else 
+		//bad juju happened or some  suff
+	#endif
 	free(medPtr);
 	free(udp);
 	free(frameName);
 	free(ipH);
-//	free(meditrik);
 	printf("\n\n\n");
 	fclose(file);
 }
 
-int getMessageType(unsigned char* bits, int size){
-	if (size < 0 || bits == NULL){
-		printf("ERROR: Invalid MESSAGE Type");
-		return 0;
-	}
-	return bits[1] & 7;
-}
 
-int getSequenceID(unsigned char* bits, int size){
-	if (size < 0 || bits == NULL){
-		printf("ERROR: Invalid SEQUENCE ID\n");
-		return 0;
-	}
-	unsigned char leftSide = bits[0] & 15;
-	unsigned char rightSide = bits[1] >> 3;
-	return (32* leftSide + rightSide);
-}
 
