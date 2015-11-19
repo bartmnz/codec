@@ -14,7 +14,7 @@ int getSequenceID(unsigned char*, int);
 int main(void){
 	unsigned char buffer[40];
 	FILE* file;
-	file = fopen("hello.pcap", "rb");
+	file = fopen("gps.pcap", "rb");
 	fread(buffer,sizeof(buffer), 1,file);
 	printHeader(buffer, sizeof(buffer));
 
@@ -23,10 +23,11 @@ int main(void){
 
 	unsigned char temp[1];
 	fread(temp, sizeof(temp), 1, file);
-	//printHeader(temp, sizeof(temp));	
+	printHeader(temp, sizeof(temp));	
 
 	int sizeof_ip = getIpLen(temp, sizeof(temp));
-	struct ipv4Header* ipH = malloc(sizeof_ip);
+	printf("%d\n",sizeof_ip);
+	struct ipv4Header* ipH = malloc(sizeof_ip+2);
 	setIpHeader(file, ipH, sizeof_ip, temp);
 
 	struct udpHeader* udp;
@@ -34,47 +35,53 @@ int main(void){
 	if(ipH->nextProtocol[0] == 0x11){
 		setUdpHeader(file, udp);
 		//fread(udp, sizeof(udp), 1, file);
-	//	printHeader(udp ,sizeof(udp));
+
 	}else{
 		printf("ERROR: not utilizing UDP protocol\n");
 	}	
 	
-	struct meditrik* medPtr = malloc(14);
+	struct meditrik* medPtr = malloc(sizeof(struct meditrik));
+
+
+
+
 	setMeditrikHeader(file, medPtr);
+	
 
-//	unsigned char* meditrik;
-//	int sizeof_meditrik = (udp->length[0]*256 + udp->length[1])-8;
-//	meditrik = malloc(sizeof_meditrik);
-//	fread(meditrik, sizeof_meditrik, 1, file);
-//	printHeader(meditrik, sizeof_meditrik);
-//	printf("\nmessage type is %d\n", getMessageType(meditrik, sizeof_meditrik));
-//	printf("Sequence Id is : %d\n", getSequenceID(meditrik, sizeof_meditrik));
+	struct gps* gpsPtr;
+	bool wasGPS = false;
+	if(medPtr->type[0] == 0X10){
+		gpsPtr = malloc(20);
+		setGps(file, gpsPtr);
+		wasGPS = true;
+	}
+	
 
-
+	if(wasGPS) free(gpsPtr);
 	free(medPtr);
 	free(udp);
 	free(frameName);
 	free(ipH);
-//	free(meditrik);
+
 	printf("\n\n\n");
 	fclose(file);
 }
 
-int getMessageType(unsigned char* bits, int size){
-	if (size < 0 || bits == NULL){
-		printf("ERROR: Invalid MESSAGE Type");
-		return 0;
-	}
-	return bits[1] & 7;
-}
 
-int getSequenceID(unsigned char* bits, int size){
-	if (size < 0 || bits == NULL){
-		printf("ERROR: Invalid SEQUENCE ID\n");
-		return 0;
-	}
-	unsigned char leftSide = bits[0] & 15;
-	unsigned char rightSide = bits[1] >> 3;
-	return (32* leftSide + rightSide);
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
