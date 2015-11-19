@@ -27,7 +27,10 @@ struct command{
 };
 
 struct gps{
-	unsigned char longitute[8];
+	union{
+		unsigned char uc[8];
+		double d;
+	};
 	unsigned char latitude[8];
 	unsigned char altitude[4];
 };

@@ -49,15 +49,34 @@ int main(void){
 	
 
 	struct gps* gpsPtr;
-	bool wasGPS = false;
-	if(medPtr->type[0] == 0X10){
-		gpsPtr = malloc(20);
+	struct command* cmdPtr;
+	struct message* msgPtr;
+	struct status* stsPtr;
+	int type = (int) medPtr->type[0];
+	printf("int is %d", type);
+	if(type == 2){
+		gpsPtr = malloc(sizeof(struct gps));
 		setGps(file, gpsPtr);
-		wasGPS = true;
+		printf("longitude is %f\n", gpsPtr->d);
+	}else if(type == 3){
+		msgPtr = malloc(sizeof(struct message));
+		// need to set size of message from size of packet
+		setMessage(file, msgPtr, 10);
+	}else if(type == 1){
+		cmdPtr = malloc(sizeof(struct command));
+		//need to set true / false from size of packet
+		setCommand(file, cmdPtr, false);
+	}else if(type == 0){
+		stsPtr = malloc(sizeof(struct status));
+		setStatus(file, stsPtr);
+	}else{
+		printf("ERROR: invalid message type");
 	}
 	
-
-	if(wasGPS) free(gpsPtr);
+	if(type == 0) free(stsPtr);
+	if(type == 1) free(cmdPtr);
+	if(type == 2) free(gpsPtr);
+	if(type == 3) free(msgPtr);
 	free(medPtr);
 	free(udp);
 	free(frameName);

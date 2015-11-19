@@ -31,7 +31,7 @@ void setStatus(FILE* file, struct status* stsPtr){
 }
 
 void setGps(FILE* file, struct gps* gpsPtr){
-	fread(gpsPtr->longitute, 8, 1, file);
+	fread(gpsPtr->uc, 8, 1, file);
 	fread(gpsPtr->latitude, 8, 1, file);
 	fread(gpsPtr->altitude, 4, 1, file);
 }
