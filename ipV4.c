@@ -5,14 +5,10 @@
 
 
 
-void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size, unsigned char* first){
-
-
-
-
-	if(size == 20){
+void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size,
+						 unsigned char* first){
+//	if(size == 20){
 		unsigned char temp[2];
-
 		ipv4Header->version[0] = first[0] & 240;
 		ipv4Header->headerLength[0] = first[0] & 15;
 		fread(ipv4Header->TOS, 1, 1, file);
@@ -26,13 +22,12 @@ void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size, unsigned ch
 		fread(ipv4Header->nextProtocol, 1, 1, file);
 		fread(ipv4Header->headerCheckSum, 2, 1, file);
 		fread(ipv4Header->sourceAddress, 4, 1, file);
+		printHeader(ipv4Header->sourceAddress, 4);
 		fread(ipv4Header->destinationAddress, 4, 1, file);
-		// if len > 20 fread(ipv4Header->options, len - 20 in bytes, 1, file);
-	}
-
-//	printHeader(ipv4Header->destinationAddress, 4);
+		printHeader(ipv4Header->destinationAddress, 4);
+//	}
+	printf("here is %d\n", size);
 }
-
 int getIpLen(unsigned char* bits, int size){
 	if (size < 0 || bits == NULL){
 		printf("ERROR: Invalid IP Length");

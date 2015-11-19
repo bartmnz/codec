@@ -7,8 +7,8 @@
 #include "udp.h"
 #include "meditrik.h"
 
-
-
+int getMessageType( unsigned char*, int);
+int getSequenceID(unsigned char*, int);
 
 
 int main(void){
@@ -23,10 +23,11 @@ int main(void){
 
 	unsigned char temp[1];
 	fread(temp, sizeof(temp), 1, file);
-	//printHeader(temp, sizeof(temp));	
+	printHeader(temp, sizeof(temp));	
 
 	int sizeof_ip = getIpLen(temp, sizeof(temp));
-	struct ipv4Header* ipH = malloc(sizeof_ip);
+	printf("%d\n",sizeof_ip);
+	struct ipv4Header* ipH = malloc(sizeof_ip+2);
 	setIpHeader(file, ipH, sizeof_ip, temp);
 
 	struct udpHeader* udp;
@@ -34,61 +35,53 @@ int main(void){
 	if(ipH->nextProtocol[0] == 0x11){
 		setUdpHeader(file, udp);
 		//fread(udp, sizeof(udp), 1, file);
-	//	printHeader(udp ,sizeof(udp));
+
 	}else{
 		printf("ERROR: not utilizing UDP protocol\n");
 	}	
 	
-	struct meditrik* medPtr = malloc(14);
-	setMeditrikHeader(file, medPtr);
+	struct meditrik* medPtr = malloc(sizeof(struct meditrik));
 
-	struct statusPayload* stPtr;
-	struct commandPayload* cmdPtr;
-	struct gpsPayload* gpsPtr;
+
+
+
+	setMeditrikHeader(file, medPtr);
 	
 
-	if(medPtr->type == 0){
-		#define StatusMessage
-		stPtr = malloc(14);
-		setStatusPayload(file, stPtr);
-	}else if(medPtr->type == 1){
-		#define CommandInstruction
-		cmdPtr = malloc(4);
-		// set bool to  equal accurate value -- if has options params
-		setCommandPayload(file, cmdPtr, false);
-	}else if(medPtr->type == 2){
-		#define GpsInstruction
+	struct gps* gpsPtr;
+	bool wasGPS = false;
+	if(medPtr->type[0] == 0X10){
 		gpsPtr = malloc(20);
-		setGpsPayload(file, gpsPtr);
-	}else if(medPtr->type == 3){
-		#define MessageInstruction
-	//	struct messagePayload* msgPtr = malloc(//figure out size of message)
-	//	setmessagePayload(file, msgPtr);
-
-	}else{
-		// do something here because you have invalid input.
+		setGps(file, gpsPtr);
+		wasGPS = true;
 	}
+	
 
-
-
-	#ifdef StatusMessage 
-		free(stPtr);
-	#elif defined CommandInstruction
-		free(cmdPtr);
-	#elif defined GpsInstruction
-		free(gpsPtr);
-	#elif defined MessageInstruction
-		free(msgPtr);
-	#else 
-		//bad juju happened or some  suff
-	#endif
+	if(wasGPS) free(gpsPtr);
 	free(medPtr);
 	free(udp);
 	free(frameName);
 	free(ipH);
+
 	printf("\n\n\n");
 	fclose(file);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
