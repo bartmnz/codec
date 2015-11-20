@@ -12,13 +12,17 @@ int getMessageType( unsigned char*, int);
 int getSequenceID(unsigned char*, int);
 
 
-int main(void){
+int main(int argc, const char* argv[]){
 
 // chekc if machine is little or big endian see here  http://stackoverflow.com/questions/19275955/convert-little-endian-to-big-endian
 	bool isLE = true;
 	unsigned char buffer[40];
 	FILE* file;
-	file = fopen("status.pcap", "rb");
+	if (argc <= 1){
+		file = fopen("status.pcap", "rb");	
+	}else {
+		file = fopen(argv[1], "rb");
+	}
 	fread(buffer,sizeof(buffer), 1,file);
 //	printHeader(buffer, sizeof(buffer));
 
