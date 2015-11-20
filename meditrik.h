@@ -78,7 +78,8 @@ struct gps{
 };
 
 struct message{
-	unsigned char* message;
+	size_t len;
+	unsigned char message[];
 };
 
 //int getMessageType(struct meditrik*);

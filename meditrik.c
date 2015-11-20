@@ -8,12 +8,14 @@
 void setMeditrikHeader(FILE* file, struct meditrik* medPtr){
 	unsigned char temp[2];
 	fread(temp, 2, 1, file);
+	medPtr->verIN = 0;
 	medPtr->verUC[0] = temp[0] >> 4;
 
 	medPtr->seqUC[0] = (temp[0] & 8) >> 3;
 	medPtr->seqUC[1] = (temp[1] >> 3) | ( temp[0] << 5);
-	
+	medPtr->typeIN = 0;	
 	medPtr->typeUC[0] = temp[1] & 7;
+	medPtr->lenIN = 0;
 	fread(medPtr->lenUC, 2, 1, file);
 	fread(medPtr->srcUC, 4, 1, file);
 	fread(medPtr->dstUC, 4, 1, file);
@@ -40,5 +42,7 @@ void setGps(FILE* file, struct gps* gpsPtr){
 
 void setMessage(FILE* file, struct message* msgPtr, int size){
 	// some error checking
+	if(size)
 	fread(msgPtr->message, size, 1, file);
+//	msgPtr->message[size] = '\0';
 }
