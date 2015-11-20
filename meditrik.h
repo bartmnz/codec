@@ -6,33 +6,75 @@
 
 
 struct meditrik{
-	unsigned char version[1];
-	unsigned char sequenceID[2];
-	unsigned char type[1];
-	unsigned char totalLength[2];
-	unsigned char sourceID[4];
-	unsigned char destinationID[4];
+	union{
+		unsigned char verUC[1];
+		int verIN;
+	};
+	union{
+		unsigned char seqUC[2];
+		int seqIN;
+	};
+	union{
+		unsigned char typeUC[1];
+		int typeIN;
+	};
+	union{
+		unsigned char lenUC[2];
+		int lenIN;
+	};
+	union{
+		unsigned char srcUC[4];
+		unsigned int srcIN;
+	};
+	union{
+		unsigned char dstUC[4];
+		int dstIN;
+	};
 };
 
 struct status{
-	unsigned char batPow[8];
-	unsigned char glucose[2];
-	unsigned char capsaicin[2];
-	unsigned char omorfine[2];
+	union{
+		unsigned char batUC[8];
+		double batDB;
+	};
+	union{
+		unsigned char gluUC[2];
+		int gluIN;
+	};
+	union{
+		unsigned char capUC[2];
+		int capIN;
+	};
+	union{
+		unsigned char omoUC[2];
+		int omoIN;
+	};
 };
 
 struct command{
-	unsigned char comm[2];
-	unsigned char para[2];
+	union{
+		unsigned char comUC[2];
+		int comIN;
+	};
+	union{
+		unsigned char parUC[2];
+		int parIN;
+	};
 };
 
 struct gps{
 	union{
-		unsigned char uc[8];
-		double d;
+		unsigned char longUC[8];
+		double longDB;
 	};
-	unsigned char latitude[8];
-	unsigned char altitude[4];
+	union{
+		unsigned char latiUC[8];
+		double latiDB;
+	};
+	union{
+		unsigned char altiUC[4];
+		float altiDB;
+	};
 };
 
 struct message{

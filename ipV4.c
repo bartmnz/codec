@@ -7,7 +7,9 @@
 
 void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size,
 						 unsigned char* first){
-//	if(size == 20){
+	
+// change to if size > 20 fill out options
+	if(size == 20){
 		unsigned char temp[2];
 		ipv4Header->version[0] = first[0] & 240;
 		ipv4Header->headerLength[0] = first[0] & 15;
@@ -22,11 +24,11 @@ void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size,
 		fread(ipv4Header->nextProtocol, 1, 1, file);
 		fread(ipv4Header->headerCheckSum, 2, 1, file);
 		fread(ipv4Header->sourceAddress, 4, 1, file);
-		printHeader(ipv4Header->sourceAddress, 4);
+//		printHeader(ipv4Header->sourceAddress, 4);
 		fread(ipv4Header->destinationAddress, 4, 1, file);
-		printHeader(ipv4Header->destinationAddress, 4);
-//	}
-	printf("here is %d\n", size);
+//		printHeader(ipv4Header->destinationAddress, 4);
+	}
+//	printf("here is %d\n", size);
 }
 int getIpLen(unsigned char* bits, int size){
 	if (size < 0 || bits == NULL){

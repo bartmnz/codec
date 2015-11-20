@@ -18,19 +18,19 @@ int main(void){
 	bool isLE = true;
 	unsigned char buffer[40];
 	FILE* file;
-	file = fopen("status.pcap", "rb");
+	file = fopen("gps.pcap", "rb");
 	fread(buffer,sizeof(buffer), 1,file);
-//	printHeader(buffer, sizeof(buffer));
+	printHeader(buffer, sizeof(buffer));
 
 	struct ethernetFrame* frameName = malloc(14);
 	setEthernetHeader(file, frameName);	
 
 	unsigned char temp[1];
 	fread(temp, sizeof(temp), 1, file);
-//	printHeader(temp, sizeof(temp));	
+	printHeader(temp, sizeof(temp));	
 
 	int sizeof_ip = getIpLen(temp, sizeof(temp));
-//	printf("%d\n",sizeof_ip);
+	printf("%d\n",sizeof_ip);
 	struct ipv4Header* ipH = malloc(sizeof_ip+2);
 	setIpHeader(file, ipH, sizeof_ip, temp);
 
@@ -44,14 +44,14 @@ int main(void){
 	struct meditrik* medPtr = malloc(sizeof(struct meditrik));
 	setMeditrikHeader(file, medPtr);
 
-
+	printf("Before flip From:  %d\n", ntohl((int)&medPtr->srcIN));
+		
 	printf("Version: %d\n", medPtr->verIN);
+	printf("Sequence: %d\n", medPtr->seqIN);
 	if (isLE){
-		medPtr->seqIN = ntohs(medPtr->seqIN);
 		medPtr->srcIN = ntohl(medPtr->srcIN);
 		medPtr->dstIN = ntohl(medPtr->dstIN);
 	}
-	printf("Sequence: %d\n",medPtr->seqIN);
 	printf("From:  %u\n", medPtr->srcIN);	
 	printf("To:  %d\n", medPtr->dstIN);
 
@@ -79,10 +79,6 @@ int main(void){
 	}else if(type == 0){
 		stsPtr = malloc(sizeof(struct status));
 		setStatus(file, stsPtr);
-		printf("Battery: %.2f%% \n", 100* stsPtr->batDB);
-		printf("Glucose: %d\n", ntohs(stsPtr->gluIN));
-		printf("Capsaicin: %d\n", ntohs(stsPtr->capIN));
-		printf("Omorfine: %d\n", ntohs(stsPtr->omoIN));
 	}else{
 		printf("ERROR: invalid message type");
 	}
