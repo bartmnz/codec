@@ -1,4 +1,5 @@
 #include <stdio.h>
+#include <string.h>
 #include "meditrik.h"
 
 //int getMessageType(struct meditrick* mdPtr){-
@@ -6,6 +7,7 @@
 //
 
 void setMeditrikHeader(FILE* file, struct meditrik* medPtr){
+	memset(medPtr, 0, sizeof(struct meditrik));
 	unsigned char temp[2];
 	fread(temp, 2, 1, file);
 	medPtr->verIN = 0;
@@ -13,9 +15,9 @@ void setMeditrikHeader(FILE* file, struct meditrik* medPtr){
 
 	medPtr->seqUC[0] = (temp[0] & 8) >> 3;
 	medPtr->seqUC[1] = (temp[1] >> 3) | ( temp[0] << 5);
-	medPtr->typeIN = 0;	
+//	medPtr->typeIN = 0;	
 	medPtr->typeUC[0] = temp[1] & 7;
-	medPtr->lenIN = 0;
+//	medPtr->lenIN = 0;
 	fread(medPtr->lenUC, 2, 1, file);
 	fread(medPtr->srcUC, 4, 1, file);
 	fread(medPtr->dstUC, 4, 1, file);
@@ -23,11 +25,13 @@ void setMeditrikHeader(FILE* file, struct meditrik* medPtr){
 }
 
 void setCommand(FILE* file, struct command* cmdPtr, bool hasPara){
+	memset(cmdPtr, 0, sizeof( struct command));
 	fread(cmdPtr->comUC, 2, 1, file);
 	if(hasPara)fread(cmdPtr->parUC, 2, 1, file);
 }
 
 void setStatus(FILE* file, struct status* stsPtr){
+	memset(stsPtr, 0, sizeof( struct status));
 	fread(stsPtr->batUC, 8, 1, file);
 	fread(stsPtr->gluUC, 2, 1, file);
 	fread(stsPtr->capUC, 2, 1, file);
@@ -35,14 +39,16 @@ void setStatus(FILE* file, struct status* stsPtr){
 }
 
 void setGps(FILE* file, struct gps* gpsPtr){
+	memset(gpsPtr, 0, sizeof(struct gps));
 	fread(gpsPtr->longUC, 8, 1, file);
 	fread(gpsPtr->latiUC, 8, 1, file);
 	fread(gpsPtr->altiUC, 4, 1, file);
+
 }
 
 void setMessage(FILE* file, struct message* msgPtr, int size){
 	// some error checking
-	if(size)
-	fread(msgPtr->message, size, 1, file);
-//	msgPtr->message[size] = '\0';
+	memset(msgPtr, 0, size+10);
+	fread(msgPtr->message, size-1, 1, file);
+	msgPtr->message[size] = '\n';
 }

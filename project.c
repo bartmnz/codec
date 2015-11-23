@@ -1,6 +1,8 @@
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 #include <arpa/inet.h>
+#include <unistd.h>
 
 #include "ethernetFrame.h"
 #include "printHeader.h"
@@ -15,13 +17,16 @@ int getSequenceID(unsigned char*, int);
 int main(int argc, const char* argv[]){
 
 // chekc if machine is little or big endian see here  http://stackoverflow.com/questions/19275955/convert-little-endian-to-big-endian
-	bool isLE = true;
+	bool isLE = checkEndian;
 	unsigned char buffer[40];
 	FILE* file;
 	if (argc <= 1){
 		file = fopen("status.pcap", "rb");	
-	}else {
+	}else if (access(argv[1], R_OK)){
 		file = fopen(argv[1], "rb");
+	} else{
+		printf("ERROR: File does not exist or you do not have write premissions\n");	
+		return 1;
 	}
 	fread(buffer,sizeof(buffer), 1,file);
 
@@ -40,13 +45,15 @@ int main(int argc, const char* argv[]){
 
 	struct udpHeader* udp; 
 	udp = malloc(8);
-	*udp = {0};
+//	memset(udp, 0, sizeof(struct udpHeader));
+	//*udp = {0};
 	if(ipH->nextProtocol[0] == 0x11){
 		setUdpHeader(file, udp);
 	}else{
 		printf("ERROR: not utilizing UDP protocol\n");
 	}		
 	struct meditrik* medPtr = malloc(sizeof(struct meditrik));
+	memset(medPtr, 0, sizeof(struct meditrik));
 	setMeditrikHeader(file, medPtr);
 
 
@@ -75,8 +82,18 @@ int main(int argc, const char* argv[]){
 		printf("Altitude : %.0f ft. \n", gpsPtr->altiDB * 6); // stored as fathoms 
 	}else if(type == 3){
 		int szData = ntohs(medPtr->lenIN) - 12;
-		msgPtr = malloc(szData+1);
+		printf("%d\n", szData);
+		msgPtr = malloc(8+szData);
+		long int p =ntohl((long int) &msgPtr);
+		printf("%ld\n", sizeof(struct meditrik));
+		printf("%ld\n", p);
+		
+		long int s = (long int) msgPtr;
+		printf("%ld\n", s);
+		long int c =(long int) &msgPtr->message;
+		printf("%ld\n", c);
 		setMessage(file, msgPtr, szData);
+//		printHeader(msgPtr->message 24);
 		printf("%s\n",  msgPtr->message);
 	}else if(type == 1){
 		cmdPtr = malloc(sizeof(struct command));
@@ -117,7 +134,10 @@ int main(int argc, const char* argv[]){
 
 
 
-
+bool checkEndian(void){
+	int n = 1;
+	return (*(char *)&n == 1) 
+}
 
 
 
