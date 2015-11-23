@@ -85,11 +85,11 @@ struct message{
 //int getMessageType(struct meditrik*);
 //int getSequenceID(struct meditrik*);
 //int getVersion(struct meditrik*);
-void setMeditrikHeader(FILE*, struct meditrik*);
-void setCommand(FILE*, struct command*, bool);
-void setStatus(FILE*, struct status*);
-void setGps(FILE*, struct gps*);
-void setMessage(FILE*, struct message*, int); 
+void getMeditrikHeader(FILE*, bool);
+void getCommand(FILE*, bool);
+void getStatus(FILE*); 
+void getGps(FILE*);
+void getMessage(FILE*, int); 
 
 
 
