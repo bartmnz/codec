@@ -105,10 +105,10 @@ void getGps(FILE* file){
 
 void getMessage(FILE* file, int size){
 	// some error checkiing
-	struct message* msgPtr = malloc(size);
+	struct message* msgPtr = malloc(size+8);
 	memset(msgPtr, 0, size);
 	fread(msgPtr->message, size-1, 1, file);
-	msgPtr->message[size] = '\n';
+	msgPtr->message[size-1] = '\n';
 
 	printf("%s\n", msgPtr->message);
 	free(msgPtr);
