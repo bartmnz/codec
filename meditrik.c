@@ -24,6 +24,7 @@ void getMeditrikHeader(FILE* file, bool isLE){
 	fread(medPtr->dstUC, 4, 1, file);
 	if(medPtr->verIN != 1){
 		printf("ERROR: Unsupported version number!\n");
+		free(medPtr);
 		return;
 	}
 	printf("Version: %d\n", medPtr->verIN);
@@ -49,6 +50,7 @@ void getMeditrikHeader(FILE* file, bool isLE){
 		getMessage(file, szData);
 	}else{
  		printf("ERROR: invalid message type");
+		free(medPtr);
 		return;
 	}
 	free(medPtr);
