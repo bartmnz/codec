@@ -16,8 +16,10 @@ int getMessageType( unsigned char*, int);
 int getSequenceID(unsigned char*, int);
 bool checkEndian(void);
 void problems(void);
-void stripHeaders(FILE*);
+void stripHeaders(FILE*, bool);
 void evaluatePcap(unsigned char*);
+void stripGlobal(FILE*);
+
 
 int main(int argc, const char* argv[]){
 	bool isLE = checkEndian();
@@ -25,9 +27,14 @@ int main(int argc, const char* argv[]){
 	if(argc != 2){ // set errno goto problems
 	};
 	if(!(file = fopen(argv[1], "rb"))) problems();
-	stripHeaders(file);
-	getMeditrikHeader(file, isLE);
-	printf("\n\n\n");
+	stripGlobal(file);
+	bool hasRun = false;
+	while (true){
+		stripHeaders(file, hasRun);
+		getMeditrikHeader(file, isLE);
+		printf("\n\n\n");
+		hasRun = true;
+	}
 	fclose(file);
 }
 
@@ -36,10 +43,24 @@ bool checkEndian(void){
 	return (*(char *)&n == 1); 
 }
 
-void stripHeaders(FILE* file){
-	unsigned char buffer[40];
-	fread(buffer,sizeof(buffer), 1,file);
+void stripGlobal(FILE* file){
+	unsigned char buffer[24];
+	int size;
+	size = fread(buffer,sizeof(buffer), 1,file);
+	if (size != 1) problems();
 	evaluatePcap(buffer);
+}
+
+void stripHeaders(FILE* file, bool hasRun){
+//	unsigned char buffer[40];
+//	int size;
+//	size = fread(buffer,sizeof(buffer), 1,file);
+//	if(size != 40) printf("At EOF\n");
+//	evaluatePcap(buffer);
+	int size;
+	unsigned char buffer[16]; // strip off local header ignore for now
+	size = fread(buffer, sizeof(buffer), 1, file);
+	if (size != 1 && hasRun) exit(0);
 	struct ethernetFrame* frameName = malloc(14);
 	setEthernetHeader(file, frameName);
 	unsigned char temp[1];
@@ -65,27 +86,16 @@ void stripHeaders(FILE* file){
 }
 
 void evaluatePcap(unsigned char* header){
-	unsigned char magicNum[4];
-	unsigned char numMagic[4];
-	memcpy(magicNum, (unsigned char[]) { 0xd4, 0xc3, 0xb2, 0xa1 }, sizeof(magicNum));
-	memcpy(numMagic, (unsigned char[]) { 0xa1, 0xb2, 0xc3, 0xd4 }, sizeof(numMagic));
-	bool isLe = !(memcmp(magicNum, header, 4));
-	bool isBe = !(memcmp(numMagic, header, 4));
+	unsigned char magicNum[8];
+	unsigned char numMagic[8];
+	memcpy(magicNum, (unsigned char[]) { 0xd4, 0xc3, 0xb2, 0xa1, 0x02, 0x00, 0x04, 0x00 }, sizeof(magicNum));
+	memcpy(numMagic, (unsigned char[]) { 0xa1, 0xb2, 0xc3, 0xd4, 0x00, 0x02, 0x00, 0x04 }, sizeof(numMagic));
+	bool isLe = !(memcmp(magicNum, header, 8));
+	bool isBe = !(memcmp(numMagic, header, 8));
 	if(!(isLe ||  isBe)){
-		printf("%d\n", memcmp(numMagic, header, 4));
 		errno = ENOTSUP;
 		problems();
-	}
-	unsigned char version[4];
-	unsigned char noisrev[4];
-	memcpy(version, (unsigned char[]) { 0x02, 0x00, 0x04, 0x00 }, sizeof(version));
-	memcpy(noisrev, (unsigned char[]) { 0x00, 0x02, 0x00, 0x04 }, sizeof(noisrev));
-	if((isLe && memcmp(version, &header[4], 4)) ||
-		(isBe && memcmp(noisrev, &header[4], 4))){
-		errno = EPROTONOSUPPORT;
-		problems();
-	}
-
+	}	
 	unsigned char linkHeader[4];
 	unsigned char headerLink[4];
 	memcpy(linkHeader, (unsigned char[]) {0x01, 0x00, 0x00, 0x00}, sizeof(linkHeader));
@@ -98,6 +108,7 @@ void evaluatePcap(unsigned char* header){
 	}
 
 }
+
 void problems(void){
 	printf("ERROR: %s\n", strerror(errno));
 	exit(errno);
