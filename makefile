@@ -1,7 +1,7 @@
 CFLAGS= -std=c11 -Wall -Werror -Wextra -pedantic -Wno-deprecated  -Wstack-usage=1024 
 
-TARGET=project
-OBJS=project.o ethernetFrame.o printHeader.o ipV4.o udp.o meditrik.o
+TARGET=encoder
+OBJS=encoder.o ethernetFrame.o printHeader.o ipV4.o udp.o meditrik.o 
 
 .PHONY: clean debug profile
 
@@ -18,4 +18,4 @@ clean:
 profile: CFLAGS+=-pg
 profile: LDFLAGS+=-pg
 profile: $(TARGET)
-hangMan.o: 
+ 
