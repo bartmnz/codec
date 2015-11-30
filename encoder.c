@@ -7,10 +7,10 @@
 
 
 #include "meditrik.h"
-#include "ethernetFrame.h"
-#include "ipV4.h"
-#include "udp.h"
-#include "printHeader.h"
+//#include "ethernetFrame.h"
+//#include "ipV4.h"
+//#include "udp.h"
+//#include "printHeader.h"
 
 #define MAXSIZE 40
 
@@ -58,23 +58,23 @@ double checkLine(FILE* file, const char * text){
 void setHeader(FILE* file){
 	bool isLe = true;
 	
-	struct meditrik* medPtr = malloc(sizeof(struct meditrik));
-	if( (medPtr->verIN = (int) checkLine(file, "Version: ")) != 1){
+	struct frame* frmPtr = malloc(sizeof(struct frame));
+	if( (frmPtr->medPtr.verIN = (int) checkLine(file, "Version: ")) != 1){
 		fprintf(stdout, "Unsupported version Expected version 1\n");
 	} 																		// actually set the version in a header
-	if( (medPtr->seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
+	if( (frmPtr->medPtr.seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
 		fprintf(stdout, "Bad Sequence number\n");
 	}
-	if( (medPtr->srcIN = (int) checkLine(file, "From: ")) < 1 ){
+	if( (frmPtr->medPtr.srcIN = (int) checkLine(file, "From: ")) < 1 ){
 		fprintf(stdout, "Bad From\n");
 	}
-	if ( (medPtr->dstIN = (int) checkLine(file, "To: ")) < 1 ){
+	if ( (frmPtr->medPtr.dstIN = (int) checkLine(file, "To: ")) < 1 ){
 		fprintf(stdout, "Bad To\n");
 	}
 	if(isLe){
-			medPtr->seqIN = ntohs(medPtr->seqIN);
-			medPtr->srcIN = ntohl(medPtr->srcIN);
-			medPtr->dstIN = ntohl(medPtr->dstIN);
+			frmPtr->medPtr.seqIN = ntohs(frmPtr->medPtr.seqIN);
+			frmPtr->medPtr.srcIN = ntohl(frmPtr->medPtr.srcIN);
+			frmPtr->medPtr.dstIN = ntohl(frmPtr->medPtr.dstIN);
 	}
 	
 //	printHeader(medPtr->srcUC, 4);
@@ -89,18 +89,18 @@ void setHeader(FILE* file){
 		fgets(array, 7, file);
 		setMessage(array);					// need to pass file pointer to get message
 	} else if( !strcmp( array, "Lat")){
-		struct gps* gpsPtr = malloc(sizeof(struct gps));
 		
-		gpsPtr->latiDB = checkLine(file, "itude: ");
-		gpsPtr->longDB = checkLine(file, "Longitude: ");
-		gpsPtr->altiDB = ((float) checkLine(file, "Altitude: "))/6;
+		frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
+		frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
+		frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
+		frmPtr->medPtr.typeIN = 2;
+		frmPtr->medPtr.lenIN = 32;
 		
-		printHeader(medPtr->srcUC, 4, "check.txt");
-		printHeader(medPtr->dstUC, 4, "check.txt");
-		printHeader(gpsPtr->longUC, 8, "check.txt");
-		printHeader(gpsPtr->latiUC, 8, "check.txt");
-		printHeader(gpsPtr->altiUC, 4, "check.txt");
-		printf("%f\n", gpsPtr->altiDB);
+		printHeader(frmPtr->medPtr.srcUC, 4, "check.txt");
+		printHeader(frmPtr->medPtr.dstUC, 4, "check.txt");
+		printHeader(frmPtr->gpsPtr.longUC, 8, "check.txt");
+		printHeader(frmPtr->gpsPtr.latiUC, 8, "check.txt");
+		printHeader(frmPtr->gpsPtr.altiUC, 4, "check.txt");
 		//setGps(file);
 	} else if( !strcmp( array, "Bat")){
 		setStatus(file);

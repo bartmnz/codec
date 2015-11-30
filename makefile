@@ -1,7 +1,7 @@
 CFLAGS= -std=c11 -Wall -Werror -Wextra -pedantic -Wno-deprecated  -Wstack-usage=1024 
 
 TARGET=encoder
-OBJS=encoder.o ethernetFrame.o printHeader.o ipV4.o udp.o meditrik.o 
+OBJS=encoder.o meditrik.o 
 
 .PHONY: clean debug profile
 
