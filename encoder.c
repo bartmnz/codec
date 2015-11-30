@@ -12,7 +12,7 @@
 #include "udp.h"
 #include "printHeader.h"
 
-#define MAXSIZE 20
+#define MAXSIZE 40
 
 
 void setHeader(FILE*);
@@ -29,20 +29,7 @@ int main( void){
 	if(!(file = fopen("test.txt", "r"))) exit(0);
 	
 	setHeader(file);
-	char array [MAXSIZE];
-	fgets(array, 4, file); 		
 	
-	if( !strcmp(array, "GET") || !strcmp(array, "Glu") || !strcmp(array, "Cap") 
-			|| !strcmp(array, "Omo")){
-		setCommand(array, file);
-	} else if( !strcmp( array, "Mes")){
-		fgets(array, 7, file);
-		setMessage(array);					// need to pass file pointer to get message
-	} else if( !strcmp( array, "Lat")){
-		setGps(file);
-	} else if( !strcmp( array, "Bat")){
-		setStatus(file);
-	} else printf("Invalid input\n");
 	//fclose(file);
 }
 /*
@@ -69,21 +56,55 @@ double checkLine(FILE* file, const char * text){
 }
 
 void setHeader(FILE* file){
+	bool isLe = true;
 	
-	if( checkLine(file, "Version: ") != 1){
+	struct meditrik* medPtr = malloc(sizeof(struct meditrik));
+	if( (medPtr->verIN = (int) checkLine(file, "Version: ")) != 1){
 		fprintf(stdout, "Unsupported version Expected version 1\n");
 	} 																		// actually set the version in a header
-
-	if( checkLine(file, "Sequence: ") < 1 ){
+	if( (medPtr->seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
 		fprintf(stdout, "Bad Sequence number\n");
 	}
-	if( checkLine(file, "From: ") < 1 ){
+	if( (medPtr->srcIN = (int) checkLine(file, "From: ")) < 1 ){
 		fprintf(stdout, "Bad From\n");
 	}
-	if ( checkLine(file, "To: ") < 1 ){
+	if ( (medPtr->dstIN = (int) checkLine(file, "To: ")) < 1 ){
 		fprintf(stdout, "Bad To\n");
 	}
+	if(isLe){
+			medPtr->seqIN = ntohs(medPtr->seqIN);
+			medPtr->srcIN = ntohl(medPtr->srcIN);
+			medPtr->dstIN = ntohl(medPtr->dstIN);
+	}
+	
+//	printHeader(medPtr->srcUC, 4);
 
+	char array [MAXSIZE];
+	fgets(array, 4, file); 		
+	
+	if( !strcmp(array, "GET") || !strcmp(array, "Glu") || !strcmp(array, "Cap") 
+			|| !strcmp(array, "Omo")){
+		setCommand(array, file);
+	} else if( !strcmp( array, "Mes")){
+		fgets(array, 7, file);
+		setMessage(array);					// need to pass file pointer to get message
+	} else if( !strcmp( array, "Lat")){
+		struct gps* gpsPtr = malloc(sizeof(struct gps));
+		
+		gpsPtr->latiDB = checkLine(file, "itude: ");
+		gpsPtr->longDB = checkLine(file, "Longitude: ");
+		gpsPtr->altiDB = ((float) checkLine(file, "Altitude: "))/6;
+		
+		printHeader(medPtr->srcUC, 4, "check.txt");
+		printHeader(medPtr->dstUC, 4, "check.txt");
+		printHeader(gpsPtr->longUC, 8, "check.txt");
+		printHeader(gpsPtr->latiUC, 8, "check.txt");
+		printHeader(gpsPtr->altiUC, 4, "check.txt");
+		printf("%f\n", gpsPtr->altiDB);
+		//setGps(file);
+	} else if( !strcmp( array, "Bat")){
+		setStatus(file);
+	} else printf("Invalid input\n");
 	printf("valid line : doing stuff\n");
 }
 
@@ -101,23 +122,7 @@ void setGps(FILE* file){
 	printf("Latitude = %f\n", checkLine(file, "itude: "));
 	checkLine(file, "Longitude: ");
 	checkLine(file, "Altitude: ");
-	/*
-	if(!(long int) &*array == (long int)strstr(array, "itude: ")){
-		printf("Invalid Line: expected 		Latitude \n");
-		return;
-	}
-	char theLine[MAXSIZE];
-	fgets(theLine, sizeof(theLine), file);
-	if(!((long int) theLine == (long int)strstr(theLine, "Longitude: "))){
-		printf("Invalid line: expected 		Longitude \n");
-		return;
-	}
-	fgets(theLine, sizeof(theLine), file);
-	if(!((long int) theLine == (long int)strstr(theLine, "Altitude: "))){
-		printf("Invalid line: expected 		Altitude \n");
-		return;
-	}
-	*/
+	
 	printf("GPS Successful\n");
 }
 
