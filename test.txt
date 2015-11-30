@@ -1,3 +1,15 @@
-Version:   
-Sequence:  
+Version: 1
+Sequence: 12
+From: 23
+To: 42
+Latitude: abcd
+Longitude: 32
+Altitude: 44
 
+Glucose=91 
+Glucose: 
+Capsaicin: 
+Omorfine: 
+Latitude: 
+Longitude: 
+Altitude: 
