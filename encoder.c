@@ -30,7 +30,7 @@ int main( void){
 	
 	setHeader(file);
 	
-	//fclose(file);
+	fclose(file);
 }
 /*
 void makeHeader(FILE* file){
@@ -127,6 +127,7 @@ void setHeader(FILE* file){
 		setStatus(file);
 	} else printf("Invalid input\n");
 	printf("valid line : doing stuff\n");
+	free(frmPtr);
 }
 
 
