@@ -93,14 +93,35 @@ void setHeader(FILE* file){
 		frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
 		frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
 		frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
-		frmPtr->medPtr.typeIN = 2;
-		frmPtr->medPtr.lenIN = 32;
+		frmPtr->medPtr.typeIN = 2; // need this here
+		frmPtr->medPtr.lenIN = htonl(32); // assign other lengths here as well
+		frmPtr->ipPtr.lenIN = 60;		//need this here
+		frmPtr->ipPtr.nxpSH = 17;
+		frmPtr->ipPtr.verSH = 4;
+		frmPtr->ipPtr.hlenSH = 5;
+		frmPtr->ipPtr.tosSH = 170;
+		frmPtr->ipPtr.idIN = 56797;		//dddd
+		frmPtr->ipPtr.flagSH = 1;
+		frmPtr->ipPtr.foffIN = htons(1);
+		frmPtr->ipPtr.ttlSH = 255;		//ff
+		frmPtr->ipPtr.chkIN = 52428; 	// cccc
+		frmPtr->ipPtr.srcLN = htonl(3735928559); 	//DEAD BEEF
+		frmPtr->ipPtr.dstLN = htonl(48879); 	//BEEF
+		frmPtr->udpPtr.srcSH = 4369;
+		frmPtr->udpPtr.dstSH = 8738;
+		frmPtr->udpPtr.lenSH = 40;		// need this here
+		frmPtr->udpPtr.chkSH = 17476;
+		unsigned short temp[3] = {43690,43690,43690};
+		memcpy( frmPtr->ethPtr.srcIN, temp, 6);
+		unsigned short to[3] = {65535,65535,65535};
+		memcpy( frmPtr->ethPtr.dstIN, to, 6);
+		frmPtr->ethPtr.nxtIN = 52428;
 		
-		printHeader(frmPtr->medPtr.srcUC, 4, "check.txt");
-		printHeader(frmPtr->medPtr.dstUC, 4, "check.txt");
-		printHeader(frmPtr->gpsPtr.longUC, 8, "check.txt");
-		printHeader(frmPtr->gpsPtr.latiUC, 8, "check.txt");
-		printHeader(frmPtr->gpsPtr.altiUC, 4, "check.txt");
+		//frmPtr->ethPtr.srcIN = 733007751850;
+		
+		
+		printMeditrik(frmPtr, "check.txt");
+
 		//setGps(file);
 	} else if( !strcmp( array, "Bat")){
 		setStatus(file);

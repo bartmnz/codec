@@ -8,30 +8,110 @@
 
 
 struct ethernetFrame {
-	unsigned char sourceIP[6];
-	unsigned char destinationIP[6];
-	unsigned char nextProtocol[2];
+	union{
+		unsigned char srcUC[6];
+		short srcIN[3];
+	};
+	union{
+		unsigned char dstUC[6];
+		short dstIN[3];
+	};
+	union{
+		unsigned char nxtUC[2];
+		unsigned short nxtIN;
+	};
 };
 
 struct ipv4Header{
-	unsigned char version[1];
-	unsigned char headerLength[1];
-	unsigned char TOS[1];
-	unsigned char totalLength[2];
-	unsigned char identification[2];
-	unsigned char flags[1];
-	unsigned char fragmentOffset[2];
-	unsigned char TTL[1];
-	unsigned char nextProtocol[1];
-	unsigned char headerCheckSum[2];
-	unsigned char sourceAddress[4];
-	unsigned char destinationAddress[4];
+	unsigned char verLen[2];
+	union{
+		unsigned char totalLength[2];
+		unsigned short lenIN;
+	};
+	union{
+		unsigned char identification[2];
+		unsigned short idIN;	
+	};
+	unsigned char flagOff[2];
+	unsigned char ttlProt[2];
+	union{
+		unsigned char headerCheckSum[2];
+		unsigned short chkIN;
+	};
+	union{
+		unsigned char sourceAddress[4];
+		unsigned int srcLN;
+	};
+	union{
+		unsigned char destinationAddress[4];
+		unsigned int dstLN;
+	};
 	//assign dynamically	unsigned char options[40];
+	union{
+		unsigned char verUC[1];
+		int verSH;
+	};
+	union{
+		unsigned char hlenUC[1];
+		short hlenSH;
+	};
+	union{
+		unsigned char TOS[1];
+		short tosSH;
+	};
+	union{
+		unsigned char flagUC[1];
+		short flagSH;
+	};
+	union{
+		unsigned char foffUC[2];
+		int foffIN;
+	};
+	union{
+		unsigned char TTL[1];
+		short ttlSH;
+	};
+	union{
+		unsigned char nextProtocol[1];
+		short nxpSH;
+	};
+	
 	
 };
 
+struct udpHeader{
+	union{
+		unsigned char srcUC[2];
+		unsigned short srcSH;
+	};
+	union{
+		unsigned char dstUC[2];
+		unsigned short dstSH;
+	};
+	union{
+		unsigned char lenUC[2];
+		unsigned short lenSH;
+	};
+	union{
+		unsigned char chkUC[2];
+		unsigned short chkSH;
+	};
+};
 
 struct meditrik{
+	unsigned char comboUC[2];
+	union{
+		unsigned char lenUC[2];
+		unsigned short lenIN;
+	};
+	union{
+		unsigned char srcUC[4];
+		unsigned int srcIN;
+	};
+	union{
+		unsigned char dstUC[4];
+		int dstIN;
+	};
 	union{
 		unsigned char verUC[1];
 		int verIN;
@@ -43,18 +123,6 @@ struct meditrik{
 	union{
 		unsigned char typeUC[1];
 		int typeIN;
-	};
-	union{
-		unsigned char lenUC[2];
-		int lenIN;
-	};
-	union{
-		unsigned char srcUC[4];
-		unsigned int srcIN;
-	};
-	union{
-		unsigned char dstUC[4];
-		int dstIN;
 	};
 };
 
@@ -108,12 +176,7 @@ struct message{
 	unsigned char message[];
 };
 
-struct udpHeader{
-	unsigned char sourcePort[2];
-	unsigned char destinationPort[2];
-	unsigned char length[2];
-	unsigned char checksum[2];
-};
+
 
 struct frame{
 	struct ethernetFrame ethPtr;
@@ -123,7 +186,7 @@ struct frame{
 	union{
 		struct command cmdPtr;
 		struct gps gpsPtr;
-	//	struct message msgPtr;
+		struct message* msgPtr;
 		struct status stsPtr;
 	};
 };
@@ -139,7 +202,7 @@ void getMessage(FILE*, int);
 void setEthernetHeader(FILE*, struct ethernetFrame*);
 
 void setIpHeader(FILE*, struct ipv4Header*, int, unsigned char*);
-
+void printMeditrik(struct frame*, const char *);
 int getIpLen(unsigned char*, int);
 void setUdpHeader(FILE*, struct udpHeader*);
 int printHeader(unsigned char*, int, const char*);

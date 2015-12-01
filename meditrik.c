@@ -122,15 +122,15 @@ void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size,
 // change to if size > 20 fill out options
 	if(size == 20){
 		unsigned char temp[2];
-		ipv4Header->version[0] = first[0] & 240;
-		ipv4Header->headerLength[0] = first[0] & 15;
+		ipv4Header->verUC[0] = first[0] & 240;
+		ipv4Header->hlenUC[0] = first[0] & 15;
 		fread(ipv4Header->TOS, 1, 1, file);
 		fread(ipv4Header->totalLength, 2, 1, file);
 		fread(ipv4Header->identification, 2, 1, file);
 		fread(temp, 2, 1, file);
-		ipv4Header->flags[0] = temp[0] & 240;
-		ipv4Header->fragmentOffset[0] = temp[0] & 15;
-		ipv4Header->fragmentOffset[1] = temp[1];
+		ipv4Header->flagUC[0] = temp[0] & 240;
+		ipv4Header->foffUC[0] = temp[0] & 15;
+		ipv4Header->foffUC[1] = temp[1];
 		fread(ipv4Header->TTL, 1,1, file);
 		fread(ipv4Header->nextProtocol, 1, 1, file);
 		fread(ipv4Header->headerCheckSum, 2, 1, file);
@@ -157,37 +157,104 @@ int getIpLen(unsigned char* bits, int size){
 
 void setEthernetHeader(FILE* file, struct ethernetFrame* ethernetFrame){
         if (!file) return;
-        fread(ethernetFrame->destinationIP, 6, 1, file);
-        fread(ethernetFrame->sourceIP, 6, 1, file);
-        fread(ethernetFrame->nextProtocol, 2, 1, file);
+        fread(ethernetFrame->dstUC, 6, 1, file);
+        fread(ethernetFrame->srcUC, 6, 1, file);
+        fread(ethernetFrame->nxtUC, 2, 1, file);
         
 }
 
 int printHeader(unsigned char* buffer, int size, const char* fileName){
-        FILE* file;
-        if(! (file = fopen(fileName, "ab"))){
-            //    exit(0);
-        };
-        fwrite( buffer, 1, size, file);
-        fclose(file);
-        /*
-        int i;
-        int count=0;
-        for(i = 0; i < size; i++){
-                fprintf(file, "%02X ",buffer[i]);
-                if (count == 15){
-                        printf("\n");
-                        count = -1 ;
-                }
-                count++;
-        }*/
+	FILE* file;
+	if(! (file = fopen(fileName, "ab"))){
+	//    exit(0);
+	};
+	fwrite( buffer, 1, size, file);
+	fclose(file);
+	/*
+	int i;
+	int count=0;
+	for(i = 0; i < size; i++){
+	fprintf(file, "%02X ",buffer[i]);
+	if (count == 15){
+	printf("\n");
+	count = -1 ;
+	}
+		count++;
+	}*/
         return 0;
         
 }
 
 void setUdpHeader(FILE* file, struct udpHeader* udp){
-	fread(udp->sourcePort, 2, 1, file);
-	fread(udp->destinationPort, 2, 1, file);
-	fread(udp->length, 2, 1, file);
-	fread(udp->checksum, 2, 1, file);
+	fread(udp->srcUC, 2, 1, file);
+	fread(udp->dstUC, 2, 1, file);
+	fread(udp->lenUC, 2, 1, file);
+	fread(udp->chkUC, 2, 1, file);
+}
+
+void printMeditrik(struct frame* frmPtr, const char * fileName){
+	FILE* file;
+	if(! (file = fopen(fileName, "wb"))){
+		exit(0);
+	};
+	//write ethernet header
+	fwrite( &(frmPtr->ethPtr), 1, sizeof(struct ethernetFrame), file);
+	printf("%d\n",(int) sizeof(struct udpHeader));
+	//write ipv4 header
+	frmPtr->ipPtr.verLen[0] = frmPtr->ipPtr.verUC[0] << 4;
+	frmPtr->ipPtr.verLen[0] = frmPtr->ipPtr.verLen[0] | frmPtr->ipPtr.hlenUC[0];
+	frmPtr->ipPtr.verLen[1] = frmPtr->ipPtr.TOS[0];
+	frmPtr->ipPtr.ttlProt[0] = frmPtr->ipPtr.TTL[0];
+	frmPtr->ipPtr.ttlProt[1] = frmPtr->ipPtr.nextProtocol[0];
+
+	frmPtr->ipPtr.flagOff[0] = frmPtr->ipPtr.flagUC[0] << 5;
+	frmPtr->ipPtr.flagOff[0] = frmPtr->ipPtr.flagOff[0] | frmPtr->ipPtr.foffUC[0];
+	frmPtr->ipPtr.flagOff[1] = frmPtr->ipPtr.foffUC[1];
+	
+	fwrite( &(frmPtr->ipPtr), 1, 24, file);
+
+	//write udp header
+	
+	fwrite( &(frmPtr->udpPtr), 1, sizeof(struct udpHeader), file);
+	
+	
+	//write meditrick header
+	unsigned char temp[2];
+	frmPtr->medPtr.comboUC[0] = frmPtr->medPtr.comboUC[0] & 0;
+	frmPtr->medPtr.comboUC[1] = frmPtr->medPtr.comboUC[1] & 0;
+	frmPtr->medPtr.comboUC[1] = frmPtr->medPtr.typeUC[0] & 7;
+	temp[1] = frmPtr->medPtr.seqUC[1] << 3;
+	frmPtr->medPtr.comboUC[1] = frmPtr->medPtr.comboUC[1] | temp[1];
+	temp[0] = frmPtr->medPtr.seqUC[1] >> 5;
+	temp[1] = temp[1] & 0;
+	temp[1] = frmPtr->medPtr.seqUC[0] << 3;
+	temp[0] = temp[0] | temp[1];
+	frmPtr->medPtr.comboUC[0] = frmPtr->medPtr.verUC[0] << 4;
+	frmPtr->medPtr.comboUC[0] = frmPtr->medPtr.comboUC[0] | temp[0];
+	
+
+	fwrite( &(frmPtr->medPtr), 1, 12, file);
+
+	if(frmPtr->medPtr.typeIN == 0){
+		fwrite( &(frmPtr->stsPtr), 1, 14, file);
+	} else if( frmPtr->medPtr.typeIN == 1){
+		fwrite( &(frmPtr->cmdPtr), 1, frmPtr->medPtr.lenIN - 14, file);
+//		fwrite( frmPtr->cmdPtr.comUC, 1, sizeof(frmPtr->cmdPtr.comUC), file);
+//		if( frmPtr->medPtr.lenIN == 16){
+//			fwrite( frmPtr->cmdPtr.parUC, 1, sizeof(frmPtr->cmdPtr.parUC), file);
+//		}
+	} else if( frmPtr->medPtr.typeIN == 2){
+		fwrite( &(frmPtr->gpsPtr), 1, 20, file);
+	} else if( frmPtr->medPtr.typeIN == 3){
+		fwrite( frmPtr->msgPtr->message, 1, frmPtr->msgPtr->len, file);
+	} else{
+		fprintf(stderr, "ERROR: Invalid message type!");
+		exit(0);
+	}
+
+	
+	
+	
+	
+	fclose(file);
 }
