@@ -211,10 +211,10 @@ void printMeditrik(struct frame* frmPtr, const char * fileName){
 	frmPtr->ipPtr.flagOff[0] = frmPtr->ipPtr.flagOff[0] | frmPtr->ipPtr.foffUC[0];
 	frmPtr->ipPtr.flagOff[1] = frmPtr->ipPtr.foffUC[1];
 	
-	fwrite( &(frmPtr->ipPtr), 1, 24, file);
+	fwrite( &(frmPtr->ipPtr), 1, 20, file);
 
 	//write udp header
-	
+
 	fwrite( &(frmPtr->udpPtr), 1, sizeof(struct udpHeader), file);
 	
 	
@@ -238,7 +238,9 @@ void printMeditrik(struct frame* frmPtr, const char * fileName){
 	if(frmPtr->medPtr.typeIN == 0){
 		fwrite( &(frmPtr->stsPtr), 1, 14, file);
 	} else if( frmPtr->medPtr.typeIN == 1){
-		fwrite( &(frmPtr->cmdPtr), 1, frmPtr->medPtr.lenIN - 14, file);
+		int size = ntohs(frmPtr->medPtr.lenIN);
+	
+		fwrite( &(frmPtr->cmdPtr), 1, size - 12, file);
 //		fwrite( frmPtr->cmdPtr.comUC, 1, sizeof(frmPtr->cmdPtr.comUC), file);
 //		if( frmPtr->medPtr.lenIN == 16){
 //			fwrite( frmPtr->cmdPtr.parUC, 1, sizeof(frmPtr->cmdPtr.parUC), file);

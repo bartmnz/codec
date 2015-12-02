@@ -19,9 +19,11 @@ void setHeader(FILE*);
 
 void setMessage(char *);
 double checkLine(FILE*, const char*);
-void setGps(FILE*);
-void setCommand(char *, FILE*);
+void setGps(FILE*, struct frame*);
+void setCommand( FILE*, struct frame*);
 void setStatus(FILE*);
+void setDefaults(struct frame*);
+void setLens(struct frame*, int);
 
 
 int main( void){
@@ -41,7 +43,7 @@ double checkLine(FILE* file, const char * text){
 	char temp[MAXSIZE], *end, array[MAXSIZE], *num;
 	fgets(array, sizeof(array), file);
 	if (!((long int)array == (long int)strstr(array, text))){
-		printf("Invalid line: expected %s \n", text);
+		printf("Invalid line: expected %s HAVE %s \n", text, array);
 		exit(0);
 	}
 	// need to implement more error checking to ensure that strings are not evaluated as a number, eg. allow for a zero value that is not abc
@@ -84,49 +86,17 @@ void setHeader(FILE* file){
 	
 	if( !strcmp(array, "GET") || !strcmp(array, "Glu") || !strcmp(array, "Cap") 
 			|| !strcmp(array, "Omo")){
-		setCommand(array, file);
+		setCommand( file, frmPtr);
 	} else if( !strcmp( array, "Mes")){
 		fgets(array, 7, file);
 		setMessage(array);					// need to pass file pointer to get message
 	} else if( !strcmp( array, "Lat")){
-		
-		frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
-		frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
-		frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
-		frmPtr->medPtr.typeIN = 2; // need this here
-		frmPtr->medPtr.lenIN = htonl(32); // assign other lengths here as well
-		frmPtr->ipPtr.lenIN = 60;		//need this here
-		frmPtr->ipPtr.nxpSH = 17;
-		frmPtr->ipPtr.verSH = 4;
-		frmPtr->ipPtr.hlenSH = 5;
-		frmPtr->ipPtr.tosSH = 170;
-		frmPtr->ipPtr.idIN = 56797;		//dddd
-		frmPtr->ipPtr.flagSH = 1;
-		frmPtr->ipPtr.foffIN = htons(1);
-		frmPtr->ipPtr.ttlSH = 255;		//ff
-		frmPtr->ipPtr.chkIN = 52428; 	// cccc
-		frmPtr->ipPtr.srcLN = htonl(3735928559); 	//DEAD BEEF
-		frmPtr->ipPtr.dstLN = htonl(48879); 	//BEEF
-		frmPtr->udpPtr.srcSH = 4369;
-		frmPtr->udpPtr.dstSH = 8738;
-		frmPtr->udpPtr.lenSH = 40;		// need this here
-		frmPtr->udpPtr.chkSH = 17476;
-		unsigned short temp[3] = {43690,43690,43690};
-		memcpy( frmPtr->ethPtr.srcIN, temp, 6);
-		unsigned short to[3] = {65535,65535,65535};
-		memcpy( frmPtr->ethPtr.dstIN, to, 6);
-		frmPtr->ethPtr.nxtIN = 52428;
-		
-		//frmPtr->ethPtr.srcIN = 733007751850;
-		
-		
-		printMeditrik(frmPtr, "check.txt");
-
-		//setGps(file);
+		setGps(file, frmPtr);
 	} else if( !strcmp( array, "Bat")){
 		setStatus(file);
 	} else printf("Invalid input\n");
 	printf("valid line : doing stuff\n");
+	printMeditrik(frmPtr, "check.txt");
 	free(frmPtr);
 }
 
@@ -140,21 +110,70 @@ void setMessage(char * array){
 	printf("setting message\n");		//update to set message
 }
 
-void setGps(FILE* file){
-	printf("Latitude = %f\n", checkLine(file, "itude: "));
-	checkLine(file, "Longitude: ");
-	checkLine(file, "Altitude: ");
-	
-	printf("GPS Successful\n");
+void setGps(FILE* file, struct frame* frmPtr){
+	frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
+	frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
+	frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
+	frmPtr->medPtr.typeIN = 2;
+	setLens(frmPtr, 32);
+	setDefaults(frmPtr);
 }
 
-void setCommand(char * array, FILE* file){
-	if( !strcmp(array, "GET")){
-		printf("have a GET command\n");
-	} else if( !strcmp( array, "Glu")){
-		printf("Glucose setting is %ld\n", (long) checkLine(file, "cose="));
-	} else printf("Invalid Line expected GET or SET\n");
-	fclose(file);
+void setLens( struct frame* frmPtr, int len){
+
+	frmPtr->medPtr.lenIN = htons(len); // assign other lengths here as well
+	frmPtr->ipPtr.lenIN = htons(len + 28);		//need this here
+	frmPtr->udpPtr.lenSH = htons(len + 8);
+}
+
+void setCommand( FILE* file, struct frame* frmPtr){
+	char array [MAXSIZE];
+	fgets(array, 4, file);
+	bool hasPara = false;
+	if (!strcmp(array, " ST")){ // GET STATUS
+		frmPtr->cmdPtr.comIN = htons(1);
+	} else	if(!strcmp(array, "cos")){ // Glucose
+		frmPtr->cmdPtr.comIN = htons(2);
+		printf("%s\n", array);
+		frmPtr->cmdPtr.parIN = htons(checkLine(file, "e="));
+		hasPara = true;
+	} else if (!strcmp(array, " GP")){ // GET GPS
+		frmPtr->cmdPtr.comIN = htons(3);
+	} else if(!strcmp(array, "sai")){ // Capsaicin
+		frmPtr->cmdPtr.comIN = htons(4);
+		frmPtr->cmdPtr.parIN = htons(checkLine(file, "cin="));
+		hasPara = true;
+	} // reserved for future use
+	/*else if (!strcmp(array, " ")){ // 
+		frmPtr->cmdPtr.comIN = htons(4);
+	}*/ 
+	else if(!strcmp(array, "rfi")){ // Omorfine
+		frmPtr->cmdPtr.comIN = htons(5);
+		frmPtr->cmdPtr.parIN = checkLine(file, "ne=");
+		hasPara = true;
+	} // reserved for future use
+	/*else if (!strcmp(array, " ")){ // 
+		frmPtr->cmdPtr.comIN = htons(6);
+	}*/ 
+	else if(!strcmp(array, "EAT")){ // REPEAT
+		frmPtr->cmdPtr.comIN = htons(7);
+		frmPtr->cmdPtr.parIN = checkLine(file, "=");
+		hasPara = true;
+	}
+	
+	frmPtr->medPtr.typeIN = 1; // need this here
+	if (hasPara){
+		setLens(frmPtr, 16);
+	} else {
+		setLens(frmPtr, 14);
+	}
+	setDefaults(frmPtr);
+	
+//	if( !strcmp(array, "GET")){
+//		printf("have a GET command\n");
+//	} else if( !strcmp( array, "Glu")){
+//		printf("Glucose setting is %ld\n", (long) checkLine(file, "cose="));
+//	} else printf("Invalid Line expected GET or SET\n");
 }
 
 void setStatus(FILE* file){
@@ -165,4 +184,28 @@ void setStatus(FILE* file){
 	checkLine(file, "Capsaicin: ");
 	
 	printf("Status Successful\n");
+}
+
+void setDefaults(struct frame* frmPtr){
+	
+	frmPtr->ipPtr.nxpSH = 17;
+	frmPtr->ipPtr.verSH = 4;
+	frmPtr->ipPtr.hlenSH = 5;
+	frmPtr->ipPtr.tosSH = 170;
+	frmPtr->ipPtr.idIN = 56797;		//dddd
+	frmPtr->ipPtr.flagSH = 1;
+	frmPtr->ipPtr.foffIN = htons(1);
+	frmPtr->ipPtr.ttlSH = 255;		//ff
+	frmPtr->ipPtr.chkIN = 52428; 	// cccc
+	frmPtr->ipPtr.srcLN = htonl(3735928559); 	//DEAD BEEF
+	frmPtr->ipPtr.dstLN = htonl(48879); 	//BEEF
+	frmPtr->udpPtr.srcSH = 4369;
+	frmPtr->udpPtr.dstSH = 8738;
+	frmPtr->udpPtr.chkSH = 17476;
+	unsigned short temp[3] = {43690,43690,43690};
+	memcpy( frmPtr->ethPtr.srcIN, temp, 6);
+	unsigned short to[3] = {65535,65535,65535};
+	memcpy( frmPtr->ethPtr.dstIN, to, 6);
+	frmPtr->ethPtr.nxtIN = 52428;
+	
 }

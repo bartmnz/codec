@@ -2,14 +2,23 @@ Version: 1
 Sequence: 109
 From: 1234
 To: 6600
+GET STATUS
+
+Glucose=91
+
 Latitude: 87.918287001
 Longitude: 32.234523432
 Altitude: 87
 
-Glucose=91 
+
+
 Glucose: 
 Capsaicin: 
 Omorfine: 
 Latitude: 
 Longitude: 
 Altitude: 
+
+Latitude: 87.918287001
+Longitude: 32.234523432
+Altitude: 87
