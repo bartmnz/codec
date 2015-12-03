@@ -103,6 +103,7 @@ void getGps(FILE* file, struct frame* frmPtr){
 
 void getMessage(FILE* file, struct frame* frmPtr){
 	int size = ntohs(frmPtr->medPtr.lenIN);
+	printf("%d\n", size);
 	fread(frmPtr->msgPtr->message, size-1, 1, file);
 	frmPtr->msgPtr->message[size-1] = '\n';
 	printf("%s\n", frmPtr->msgPtr->message);
@@ -184,7 +185,7 @@ void printMeditrik(struct frame* frmPtr, const char * fileName){
 	fwrite( &(frmPtr->locPtr), 1, 16, file);
 	//write ethernet header
 	fwrite( &(frmPtr->ethPtr), 1, sizeof(struct ethernetFrame), file);
-	printf("%d\n",(int) sizeof(struct udpHeader));
+//	printf("%d\n",(int) sizeof(struct udpHeader));
 	//write ipv4 header
 	frmPtr->ipPtr.verLen[0] = frmPtr->ipPtr.verUC[0] << 4;
 	frmPtr->ipPtr.verLen[0] = frmPtr->ipPtr.verLen[0] | frmPtr->ipPtr.hlenUC[0];

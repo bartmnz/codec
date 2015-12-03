@@ -214,9 +214,9 @@ struct frame{
 	union{
 		struct command cmdPtr;
 		struct gps gpsPtr;
-		struct message* msgPtr;
 		struct status stsPtr;
 	};
+	struct message* msgPtr;
 };
 
 //int getMessageType(struct meditrik*);

@@ -21,21 +21,25 @@ int main(int argc, const char* argv[]){
 //	bool isLE = checkEndian();
 	FILE* file;
 	if(argc != 2){ // set errno goto problems
-		printf("Usage = project (FILENAME)\n");
+		fprintf(stderr,"Usage = project (FILENAME)\n");
 		exit(0);
 	};
 	if(!(file = fopen(argv[1], "rb"))){
-		printf("ERROR: could not open file\n");
+		fprintf(stderr,"ERROR: could not open file\n");
 		exit(0);
 		//problems(file);
 	}
 	stripGlobal(file);
-	bool quit = true;
+	bool quit = false;
 	while (!quit){
 		struct frame* frmPtr = malloc(sizeof(struct frame));
+		frmPtr->msgPtr = malloc(1477);
+//		memset(frmPtr, 0, sizeof(struct frame));
+//		memset(frmPtr->msgPtr, 0, 1477);
 		quit = stripHeaders(file, frmPtr);
 		getMeditrikHeader(file, frmPtr);
-		printf("\n");
+		fprintf(stdout,"\n");
+		free(frmPtr->msgPtr);
 		free(frmPtr);
 	}
 	fclose(file);
@@ -52,24 +56,25 @@ int stripHeaders(FILE* file, struct frame* frmPtr){
 	unsigned char buffer[16]; // strip off local header ignore for now
 	size = fread(buffer, 1, sizeof(buffer), file);
 	if (size != 16){
-		return 0;
+		return 1;
 	}
 	
 	setEthernetHeader(file, &(frmPtr->ethPtr));
 	
 	unsigned char temp[1];
 	fread(temp, sizeof(temp), 1, file);
+	frmPtr->ipPtr.nextProtocol[0] = 0;
 	int sizeof_ip = getIpLen(temp, sizeof(temp));
 	setIpHeader(file, &(frmPtr->ipPtr), sizeof_ip, temp);
 	if(frmPtr->ipPtr.nextProtocol[0] != 0x11){
-		printf("ERROR1\n");
+		fprintf(stderr,"ERROR1\n");
 		//errno = EPROTONOSUPPORT;
-		return 0;
+		return 2;
 	}
 	
 	setUdpHeader(file, &(frmPtr->udpPtr));
 	
-	return 1;
+	return 0;
 }
 
 void stripGlobal(FILE* file){
@@ -77,7 +82,7 @@ void stripGlobal(FILE* file){
 	int size;
 	size = fread(header, 1, sizeof(header),file);
 	if (size != 24){
-		printf("ERROR: Invalid format\n");
+		fprintf(stderr,"ERROR: Invalid format\n");
 		exit(0);
 	//	errno = EIO;
 	//	problems(file);
@@ -89,7 +94,7 @@ void stripGlobal(FILE* file){
 	bool isLe = !(memcmp(magicNum, header, 8));
 	bool isBe = !(memcmp(numMagic, header, 8));
 	if(!(isLe ||  isBe)){
-		printf("ERROR: is not a valid PCAP file\n");
+		fprintf(stderr,"ERROR: is not a valid PCAP file\n");
 		exit(0);
 	}/*
 	unsigned char linkHeader[4];
@@ -99,7 +104,7 @@ void stripGlobal(FILE* file){
 
 	if(( isLe && memcmp(linkHeader, &header[20], 4)) ||
 		(isBe && memcmp(headerLink, &header[20], 4))){
-		printf("ERROR: is not a valid PCAP file\n");
+		fprintf(stderr,"ERROR: is not a valid PCAP file\n");
 		exit(0);
 	}
 	*/

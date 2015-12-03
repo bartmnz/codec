@@ -10,7 +10,7 @@
 #define MAXSIZE 40
 
 
-void setHeader(FILE*);
+int setHeader(FILE*, struct frame*);
 void setMessage(FILE*, struct frame*);
 double checkLine(FILE*, const char*);
 void setGps(FILE*, struct frame*);
@@ -28,11 +28,21 @@ int main( void){
 	long position = ftell(file); 
 	char temp;
 	setGlobal("check.txt");
+	
+	struct frame* frmPtr = malloc(sizeof(struct frame));
+	frmPtr->msgPtr = malloc(1478);
+	
 	while( (temp = fgetc(file)) != EOF){
+		memset(frmPtr, 0, sizeof(struct frame)- sizeof(void*));
+		memset(frmPtr->msgPtr, 0, 1478);
 		fseek(file, position, SEEK_SET);
-		setHeader(file);
-		position = ftell(file);
+		if(!setHeader(file, frmPtr)){
+			printMeditrik(frmPtr, "check.txt");
+			position = ftell(file);
+		} else break;
 	}
+	free(frmPtr->msgPtr);
+	free(frmPtr);
 	fclose(file);
 }
 /*
@@ -43,12 +53,14 @@ void makeHeader(FILE* file){
 double checkLine(FILE* file, const char * text){
 	char temp[MAXSIZE], *end, array[MAXSIZE], *num;
 	if(fgets(array, sizeof(array), file) == NULL){
-		printf("ERROR: nothing to read!!");
-		exit(0);
+		fprintf(stdout,"ERROR: nothing to read!!");
+		return -1;
+		//exit(0);
 	}
 	if (!((long int)array == (long int)strstr(array, text))){
-		printf("Invalid line: expected %s HAVE %s \n", text, array);
-		exit(0);
+		fprintf(stdout,"Invalid line: expected %s HAVE %s \n", text, array);
+		return -1;
+		//exit(0);
 	}
 	// need to implement more error checking to ensure that strings are not evaluated as a number, eg. allow for a zero value that is not abc
 	
@@ -61,28 +73,31 @@ double checkLine(FILE* file, const char * text){
 	return strtod(num, &end);
 }
 
-void setHeader(FILE* file){
-	bool isLe = true;
-	
-	struct frame* frmPtr = malloc(sizeof(struct frame));
+int setHeader(FILE* file, struct frame* frmPtr){
+//	struct frame* frmPtr = malloc(sizeof(struct frame));
+//	printf("%ld\n", (long) &frmPtr->msgPtr->len);
 	if( (frmPtr->medPtr.verIN = (int) checkLine(file, "Version: ")) != 1){
-		fprintf(stdout, "Unsupported version Expected version 1\n");
+	//	fprintf(stdout, "Unsupported version Expected version 1\n");
+		return -1;
 	} 																		// actually set the version in a header
 	if( (frmPtr->medPtr.seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
-		fprintf(stdout, "Bad Sequence number\n");
+	//	fprintf(stdout, "Bad Sequence number\n");
+		return -2;
 	}
 	if( (frmPtr->medPtr.srcIN = (int) checkLine(file, "From: ")) < 1 ){
-		fprintf(stdout, "Bad From\n");
+	//	fprintf(stdout, "Bad From\n");
+		return -3;
 	}
 	if ( (frmPtr->medPtr.dstIN = (int) checkLine(file, "To: ")) < 1 ){
-		fprintf(stdout, "Bad To\n");
+	//	fprintf(stdout, "Bad To\n");
+		return-4;
 	}
-	if(isLe){
-			frmPtr->medPtr.seqIN = ntohs(frmPtr->medPtr.seqIN);
-			frmPtr->medPtr.srcIN = ntohl(frmPtr->medPtr.srcIN);
-			frmPtr->medPtr.dstIN = ntohl(frmPtr->medPtr.dstIN);
-	}
-	
+	printf("%d\n",frmPtr->medPtr.srcIN);
+
+	frmPtr->medPtr.seqIN = htons(frmPtr->medPtr.seqIN);
+	frmPtr->medPtr.srcIN = htonl(frmPtr->medPtr.srcIN);
+	frmPtr->medPtr.dstIN = htonl(frmPtr->medPtr.dstIN);
+
 
 	char array [MAXSIZE];
 	fgets(array, 4, file); 		
@@ -91,26 +106,29 @@ void setHeader(FILE* file){
 			|| !strcmp(array, "Omo")){
 		setCommand( file, frmPtr);
 	} else if( !strcmp( array, "Mes")){
-		setMessage(file, frmPtr);					// need to pass file pointer to get message
+		
+		setMessage(file, frmPtr); // need to pass file pointer to get message
 	} else if( !strcmp( array, "Lat")){
 		setGps(file, frmPtr);
 	} else if( !strcmp( array, "Bat")){
 		setStatus(file, frmPtr);
 	} else {
 		printf("Invalid input\n");
-		exit(0);
+		return -5;
 	}
-	printf("valid line : doing stuff\n");
+	
+
 	setLocal(frmPtr);
-	printMeditrik(frmPtr, "check.txt");
-	free(frmPtr);
+	return 0;
+
+//	free(frmPtr);
 }
 
 
 
 void setMessage(FILE* file, struct frame* frmPtr){
 	char array[7];
-	frmPtr->msgPtr = malloc(1478);
+	
 	fgets(array, sizeof(array), file);
 	if(!((long int) &*array == (long int)strstr(array, "sage: "))){
 		printf("Invalid Line: expected Message: \n Have: %s\n", array);
@@ -125,13 +143,17 @@ void setMessage(FILE* file, struct frame* frmPtr){
 			exit(0);
 		}
 	}
+	
 	fseek(file, position, SEEK_SET);
+	
 	frmPtr->msgPtr->len = count;
 	fread(frmPtr->msgPtr->message, 1, count, file);
+	
 	fgets(array, sizeof(array), file); // clear out anything left inthe line
-	printf("%d\n", frmPtr->msgPtr->len);
+//	printf("%d\n", frmPtr->msgPtr->len);
 	frmPtr->medPtr.typeIN = 3;
 	setLens(frmPtr, 12 + frmPtr->msgPtr->len);
+	
 	setDefaults(frmPtr);
 }
 
@@ -160,7 +182,7 @@ void setCommand( FILE* file, struct frame* frmPtr){
 		fgets(array, MAXSIZE, file);
 	} else	if(!strcmp(array, "cos")){ // Glucose
 		frmPtr->cmdPtr.comIN = htons(2);
-		printf("%s\n", array);
+	//	printf("%s\n", array);
 		frmPtr->cmdPtr.parIN = htons(checkLine(file, "e="));
 		hasPara = true;
 	} else if (!strcmp(array, " GP")){ // GET GPS
@@ -198,7 +220,7 @@ void setCommand( FILE* file, struct frame* frmPtr){
 
 void setStatus(FILE* file, struct frame* frmPtr){
 	frmPtr->stsPtr.batDB = checkLine(file, "tery: ");
-	printf("%f\n", frmPtr->stsPtr.batDB );
+//	printf("%f\n", frmPtr->stsPtr.batDB );
 	frmPtr->stsPtr.gluIN = htons(checkLine(file, "Glucose: "));
 	
 	frmPtr->stsPtr.capIN = htons(checkLine(file, "Capsaicin: "));
@@ -208,11 +230,11 @@ void setStatus(FILE* file, struct frame* frmPtr){
 	setLens(frmPtr, 28);
 	setDefaults(frmPtr);
 	
-	printf("Status Successful\n");
+//	printf("Status Successful\n");
 }
 
 void setDefaults(struct frame* frmPtr){
-	
+
 	frmPtr->ipPtr.nxpSH = 17;
 	frmPtr->ipPtr.verSH = 4;
 	frmPtr->ipPtr.hlenSH = 5;
