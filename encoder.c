@@ -7,31 +7,32 @@
 
 
 #include "meditrik.h"
-//#include "ethernetFrame.h"
-//#include "ipV4.h"
-//#include "udp.h"
-//#include "printHeader.h"
-
 #define MAXSIZE 40
 
 
 void setHeader(FILE*);
-
-void setMessage(char *);
+void setMessage(FILE*, struct frame*);
 double checkLine(FILE*, const char*);
 void setGps(FILE*, struct frame*);
 void setCommand( FILE*, struct frame*);
-void setStatus(FILE*);
+void setStatus(FILE*, struct frame*);
 void setDefaults(struct frame*);
 void setLens(struct frame*, int);
-
+void setLocal(struct frame*);
+void setGlobal(const char*);
 
 int main( void){
 	FILE* file;
 	if(!(file = fopen("test.txt", "r"))) exit(0);
 	
-	setHeader(file);
-	
+	long position = ftell(file); 
+	char temp;
+	setGlobal("check.txt");
+	while( (temp = fgetc(file)) != EOF){
+		fseek(file, position, SEEK_SET);
+		setHeader(file);
+		position = ftell(file);
+	}
 	fclose(file);
 }
 /*
@@ -41,7 +42,10 @@ void makeHeader(FILE* file){
 */
 double checkLine(FILE* file, const char * text){
 	char temp[MAXSIZE], *end, array[MAXSIZE], *num;
-	fgets(array, sizeof(array), file);
+	if(fgets(array, sizeof(array), file) == NULL){
+		printf("ERROR: nothing to read!!");
+		exit(0);
+	}
 	if (!((long int)array == (long int)strstr(array, text))){
 		printf("Invalid line: expected %s HAVE %s \n", text, array);
 		exit(0);
@@ -79,7 +83,6 @@ void setHeader(FILE* file){
 			frmPtr->medPtr.dstIN = ntohl(frmPtr->medPtr.dstIN);
 	}
 	
-//	printHeader(medPtr->srcUC, 4);
 
 	char array [MAXSIZE];
 	fgets(array, 4, file); 		
@@ -88,26 +91,48 @@ void setHeader(FILE* file){
 			|| !strcmp(array, "Omo")){
 		setCommand( file, frmPtr);
 	} else if( !strcmp( array, "Mes")){
-		fgets(array, 7, file);
-		setMessage(array);					// need to pass file pointer to get message
+		setMessage(file, frmPtr);					// need to pass file pointer to get message
 	} else if( !strcmp( array, "Lat")){
 		setGps(file, frmPtr);
 	} else if( !strcmp( array, "Bat")){
-		setStatus(file);
-	} else printf("Invalid input\n");
+		setStatus(file, frmPtr);
+	} else {
+		printf("Invalid input\n");
+		exit(0);
+	}
 	printf("valid line : doing stuff\n");
+	setLocal(frmPtr);
 	printMeditrik(frmPtr, "check.txt");
 	free(frmPtr);
 }
 
 
 
-void setMessage(char * array){
-	if(!(long int) &*array == (long int)strstr(array, "sage: ")){
-		printf("Invalid Line: expected 		Message:\n");
+void setMessage(FILE* file, struct frame* frmPtr){
+	char array[7];
+	frmPtr->msgPtr = malloc(1478);
+	fgets(array, sizeof(array), file);
+	if(!((long int) &*array == (long int)strstr(array, "sage: "))){
+		printf("Invalid Line: expected Message: \n Have: %s\n", array);
 		return;
 	}
-	printf("setting message\n");		//update to set message
+	long position = ftell(file);
+	int temp, count = 0;
+	while( (temp = fgetc(file)) != '\0' && temp != EOF){ 
+		count++;
+		if( count == 1478){
+			fprintf(stderr, "ERROR: message is too large, max size is 1477");
+			exit(0);
+		}
+	}
+	fseek(file, position, SEEK_SET);
+	frmPtr->msgPtr->len = count;
+	fread(frmPtr->msgPtr->message, 1, count, file);
+	fgets(array, sizeof(array), file); // clear out anything left inthe line
+	printf("%d\n", frmPtr->msgPtr->len);
+	frmPtr->medPtr.typeIN = 3;
+	setLens(frmPtr, 12 + frmPtr->msgPtr->len);
+	setDefaults(frmPtr);
 }
 
 void setGps(FILE* file, struct frame* frmPtr){
@@ -132,6 +157,7 @@ void setCommand( FILE* file, struct frame* frmPtr){
 	bool hasPara = false;
 	if (!strcmp(array, " ST")){ // GET STATUS
 		frmPtr->cmdPtr.comIN = htons(1);
+		fgets(array, MAXSIZE, file);
 	} else	if(!strcmp(array, "cos")){ // Glucose
 		frmPtr->cmdPtr.comIN = htons(2);
 		printf("%s\n", array);
@@ -168,20 +194,19 @@ void setCommand( FILE* file, struct frame* frmPtr){
 		setLens(frmPtr, 14);
 	}
 	setDefaults(frmPtr);
-	
-//	if( !strcmp(array, "GET")){
-//		printf("have a GET command\n");
-//	} else if( !strcmp( array, "Glu")){
-//		printf("Glucose setting is %ld\n", (long) checkLine(file, "cose="));
-//	} else printf("Invalid Line expected GET or SET\n");
 }
 
-void setStatus(FILE* file){
-	checkLine(file, "tery: ");
+void setStatus(FILE* file, struct frame* frmPtr){
+	frmPtr->stsPtr.batDB = checkLine(file, "tery: ");
+	printf("%f\n", frmPtr->stsPtr.batDB );
+	frmPtr->stsPtr.gluIN = htons(checkLine(file, "Glucose: "));
 	
-	checkLine(file, "Glucose: ");
+	frmPtr->stsPtr.capIN = htons(checkLine(file, "Capsaicin: "));
 	
-	checkLine(file, "Capsaicin: ");
+	frmPtr->stsPtr.omoIN = htons(checkLine(file, "Omorfine: "));
+	printHeader(frmPtr->stsPtr.batUC, 8);
+	setLens(frmPtr, 28);
+	setDefaults(frmPtr);
 	
 	printf("Status Successful\n");
 }
@@ -208,4 +233,21 @@ void setDefaults(struct frame* frmPtr){
 	memcpy( frmPtr->ethPtr.dstIN, to, 6);
 	frmPtr->ethPtr.nxtIN = 52428;
 	
+}
+
+void setLocal( struct frame* frmPtr){
+	frmPtr->locPtr.lenIN = ntohs(frmPtr->ipPtr.lenIN) + 14;
+//	printf("%d\n", frmPtr->locPtr.lenIN);
+//	printf("%d\n", ntohs(frmPtr->ipPtr.lenIN));
+	frmPtr->locPtr.nxtLenIN = frmPtr->locPtr.lenIN;
+}
+
+void setGlobal( const char* fileName){
+	FILE* file;
+	if(! (file = fopen(fileName, "ab"))){
+		exit(0);
+	};
+	struct globalHeader global = {.magicIN = 2712847316, .magVerSH = 2, .minVerSH = 4};
+	fwrite( &global, 1, 24, file );
+	fclose(file);
 }

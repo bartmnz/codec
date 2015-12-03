@@ -135,11 +135,8 @@ void setIpHeader(FILE* file, struct ipv4Header* ipv4Header,int size,
 		fread(ipv4Header->nextProtocol, 1, 1, file);
 		fread(ipv4Header->headerCheckSum, 2, 1, file);
 		fread(ipv4Header->sourceAddress, 4, 1, file);
-//		printHeader(ipv4Header->sourceAddress, 4);
 		fread(ipv4Header->destinationAddress, 4, 1, file);
-//		printHeader(ipv4Header->destinationAddress, 4);
 	}
-//	printf("here is %d\n", size);
 }
 int getIpLen(unsigned char* bits, int size){
 	if (size < 0 || bits == NULL){
@@ -163,24 +160,18 @@ void setEthernetHeader(FILE* file, struct ethernetFrame* ethernetFrame){
         
 }
 
-int printHeader(unsigned char* buffer, int size, const char* fileName){
-	FILE* file;
-	if(! (file = fopen(fileName, "ab"))){
-	//    exit(0);
-	};
-	fwrite( buffer, 1, size, file);
-	fclose(file);
-	/*
+int printHeader(unsigned char* buffer, int size){
+
 	int i;
 	int count=0;
 	for(i = 0; i < size; i++){
-	fprintf(file, "%02X ",buffer[i]);
+	fprintf(stdout, "%02X ",buffer[i]);
 	if (count == 15){
 	printf("\n");
 	count = -1 ;
 	}
 		count++;
-	}*/
+	}
         return 0;
         
 }
@@ -194,9 +185,10 @@ void setUdpHeader(FILE* file, struct udpHeader* udp){
 
 void printMeditrik(struct frame* frmPtr, const char * fileName){
 	FILE* file;
-	if(! (file = fopen(fileName, "wb"))){
+	if(! (file = fopen(fileName, "ab"))){
 		exit(0);
 	};
+	fwrite( &(frmPtr->locPtr), 1, 16, file);
 	//write ethernet header
 	fwrite( &(frmPtr->ethPtr), 1, sizeof(struct ethernetFrame), file);
 	printf("%d\n",(int) sizeof(struct udpHeader));
@@ -241,10 +233,7 @@ void printMeditrik(struct frame* frmPtr, const char * fileName){
 		int size = ntohs(frmPtr->medPtr.lenIN);
 	
 		fwrite( &(frmPtr->cmdPtr), 1, size - 12, file);
-//		fwrite( frmPtr->cmdPtr.comUC, 1, sizeof(frmPtr->cmdPtr.comUC), file);
-//		if( frmPtr->medPtr.lenIN == 16){
-//			fwrite( frmPtr->cmdPtr.parUC, 1, sizeof(frmPtr->cmdPtr.parUC), file);
-//		}
+
 	} else if( frmPtr->medPtr.typeIN == 2){
 		fwrite( &(frmPtr->gpsPtr), 1, 20, file);
 	} else if( frmPtr->medPtr.typeIN == 3){

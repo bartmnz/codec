@@ -1,7 +1,7 @@
 CFLAGS= -std=c11 -Wall -Werror -Wextra -pedantic -Wno-deprecated  -Wstack-usage=1024 
 
-TARGET=encoder
-OBJS=encoder.o meditrik.o 
+TARGET=project
+OBJS=project.o meditrik.o 
 
 .PHONY: clean debug profile
 

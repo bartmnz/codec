@@ -6,6 +6,32 @@
 
 
 
+struct globalHeader{
+	union{
+		unsigned char magicNum[4];
+		unsigned int magicIN;
+	};
+	union{
+		unsigned char magVerUC[2];
+		short magVerSH;
+	};
+	union{
+		unsigned char minVerUC[2];
+		short minVerSH;
+	};
+	unsigned char zeros[16];
+};	
+struct localHeader{
+	unsigned char zeros[8];
+	union{
+		unsigned char length[4];
+		int lenIN;
+	};
+	union{
+		unsigned char nxtLen[4];
+		int nxtLenIN;
+	};
+};
 
 struct ethernetFrame {
 	union{
@@ -133,15 +159,15 @@ struct status{
 	};
 	union{
 		unsigned char gluUC[2];
-		int gluIN;
+		unsigned short gluIN;
 	};
 	union{
 		unsigned char capUC[2];
-		int capIN;
+		unsigned short capIN;
 	};
 	union{
 		unsigned char omoUC[2];
-		int omoIN;
+		unsigned short omoIN;
 	};
 };
 
@@ -172,13 +198,15 @@ struct gps{
 };
 
 struct message{
-	size_t len;
+	int len;
+//	size_t len;
 	unsigned char message[];
 };
 
 
 
 struct frame{
+	struct localHeader locPtr;
 	struct ethernetFrame ethPtr;
 	struct ipv4Header ipPtr;
 	struct udpHeader udpPtr;
@@ -205,6 +233,6 @@ void setIpHeader(FILE*, struct ipv4Header*, int, unsigned char*);
 void printMeditrik(struct frame*, const char *);
 int getIpLen(unsigned char*, int);
 void setUdpHeader(FILE*, struct udpHeader*);
-int printHeader(unsigned char*, int, const char*);
+int printHeader(unsigned char*, int);
 
 #endif
