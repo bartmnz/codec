@@ -5,95 +5,82 @@
 #include <unistd.h>
 #include <errno.h>
 
-#include "ethernetFrame.h"
-#include "printHeader.h"
-#include "ipV4.h"
-#include "udp.h"
+
 #include "meditrik.h"
 
 
 int getMessageType( unsigned char*, int);
 int getSequenceID(unsigned char*, int);
 bool checkEndian(void);
-void problems(FILE* file);
-void stripHeaders(FILE*, bool);
+int stripHeaders(FILE*, struct frame*);
 void evaluatePcap(unsigned char*);
 void stripGlobal(FILE*);
 
 
 int main(int argc, const char* argv[]){
-	bool isLE = checkEndian();
+//	bool isLE = checkEndian();
 	FILE* file;
 	if(argc != 2){ // set errno goto problems
+		printf("Usage = project (FILENAME)\n");
+		exit(0);
 	};
-	if(!(file = fopen(argv[1], "rb"))) problems(file);
-	stripGlobal(file);
-	bool hasRun = false;
-	while (true){
-		stripHeaders(file, hasRun);
-//		if(errno) problems(file);
-		getMeditrikHeader(file, isLE);
-		printf("\n");
-		hasRun = true;
+	if(!(file = fopen(argv[1], "rb"))){
+		printf("ERROR: could not open file\n");
+		exit(0);
+		//problems(file);
 	}
+	stripGlobal(file);
+	bool quit = true;
+	while (!quit){
+		struct frame* frmPtr = malloc(sizeof(struct frame));
+		quit = stripHeaders(file, frmPtr);
+		getMeditrikHeader(file, frmPtr);
+		printf("\n");
+		free(frmPtr);
+	}
+	fclose(file);
 }
 
 bool checkEndian(void){
 	int n = 1;
 	return (*(char *)&n == 1); 
 }
-/*
-void stripGlobal(FILE* file){
-	unsigned char buffer[24];
-	int size;
-	size = fread(buffer,sizeof(buffer), 1,file);
-	if (size != 1) problems(file);
-	evaluatePcap(buffer);
-	if(errno) problems(file);
-}
-*/
-void stripHeaders(FILE* file, bool hasRun){
+
+
+int stripHeaders(FILE* file, struct frame* frmPtr){
 	int size;
 	unsigned char buffer[16]; // strip off local header ignore for now
-	size = fread(buffer, sizeof(buffer), 1, file);
-	if (size != 1 && hasRun){
-		// handle exit better need to check 
-		problems(file);
-
+	size = fread(buffer, 1, sizeof(buffer), file);
+	if (size != 16){
+		return 0;
 	}
-	struct ethernetFrame* frameName = malloc(14);
-	setEthernetHeader(file, frameName);
+	
+	setEthernetHeader(file, &(frmPtr->ethPtr));
+	
 	unsigned char temp[1];
 	fread(temp, sizeof(temp), 1, file);
-	free(frameName);
-
 	int sizeof_ip = getIpLen(temp, sizeof(temp));
-	struct ipv4Header* ipH = malloc(sizeof_ip+2);
-	setIpHeader(file, ipH, sizeof_ip, temp);
-	if(ipH->nextProtocol[0] != 0x11){
-		free(ipH);
-		errno = EPROTONOSUPPORT;
-		return;
+	setIpHeader(file, &(frmPtr->ipPtr), sizeof_ip, temp);
+	if(frmPtr->ipPtr.nextProtocol[0] != 0x11){
+		printf("ERROR1\n");
+		//errno = EPROTONOSUPPORT;
+		return 0;
 	}
-	free(ipH);
-
-
-	struct udpHeader* udp = malloc(8);
-	memset(udp, 0, sizeof(struct udpHeader));	
-	setUdpHeader(file, udp);
-	free(udp);
 	
-
+	setUdpHeader(file, &(frmPtr->udpPtr));
 	
+	return 1;
 }
 
 void stripGlobal(FILE* file){
 	unsigned char header[24];
 	int size;
-	size = fread(header,sizeof(header), 1,file);
-	if (size != 1){
-		errno = EIO;
-		problems(file);
+	size = fread(header, 1, sizeof(header),file);
+	if (size != 24){
+		printf("ERROR: Invalid format\n");
+		exit(0);
+	//	errno = EIO;
+	//	problems(file);
 	}
 	unsigned char magicNum[8];
 	unsigned char numMagic[8];
@@ -102,9 +89,9 @@ void stripGlobal(FILE* file){
 	bool isLe = !(memcmp(magicNum, header, 8));
 	bool isBe = !(memcmp(numMagic, header, 8));
 	if(!(isLe ||  isBe)){
-		errno = ENOTSUP;
-		problems(file);
-	}	
+		printf("ERROR: is not a valid PCAP file\n");
+		exit(0);
+	}/*
 	unsigned char linkHeader[4];
 	unsigned char headerLink[4];
 	memcpy(linkHeader, (unsigned char[]) {0x01, 0x00, 0x00, 0x00}, sizeof(linkHeader));
@@ -112,16 +99,9 @@ void stripGlobal(FILE* file){
 
 	if(( isLe && memcmp(linkHeader, &header[20], 4)) ||
 		(isBe && memcmp(headerLink, &header[20], 4))){
-		errno = EPROTONOSUPPORT;
-		problems(file);
+		printf("ERROR: is not a valid PCAP file\n");
+		exit(0);
 	}
-
-}
-
-void problems(FILE* file){
-	file = file;
-	//fclose(file);
-	printf("ERROR: %s\n", strerror(errno));
-	exit(errno);
+	*/
 }
 

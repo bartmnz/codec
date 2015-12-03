@@ -222,11 +222,11 @@ struct frame{
 //int getMessageType(struct meditrik*);
 //int getSequenceID(struct meditrik*);
 //int getVersion(struct meditrik*);
-void getMeditrikHeader(FILE*, bool);
-void getCommand(FILE*, bool);
-void getStatus(FILE*); 
-void getGps(FILE*);
-void getMessage(FILE*, int); 
+void getMeditrikHeader(FILE*, struct frame*);
+void getCommand(FILE*, struct frame*);
+void getStatus(FILE*, struct frame*); 
+void getGps(FILE*, struct frame*);
+void getMessage(FILE*, struct frame*); 
 void setEthernetHeader(FILE*, struct ethernetFrame*);
 
 void setIpHeader(FILE*, struct ipv4Header*, int, unsigned char*);
