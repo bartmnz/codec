@@ -102,11 +102,11 @@ void getGps(FILE* file, struct frame* frmPtr){
 }
 
 void getMessage(FILE* file, struct frame* frmPtr){
+	unsigned char zero = '\0';
 	int size = ntohs(frmPtr->medPtr.lenIN);
-	printf("%d\n", size);
-	fread(frmPtr->msgPtr->message, size-1, 1, file);
+	fread(frmPtr->msgPtr->message, size-12, 1, file);
 	frmPtr->msgPtr->message[size-1] = '\n';
-	printf("%s\n", frmPtr->msgPtr->message);
+	fprintf(stdout,"%s%c", frmPtr->msgPtr->message, zero);
 
 }
 
@@ -147,7 +147,9 @@ int getIpLen(unsigned char* bits, int size){
 }
 
 void setEthernetHeader(FILE* file, struct ethernetFrame* ethernetFrame){
-        if (!file) return;
+        if (!file){
+        	return;
+        } 
         fread(ethernetFrame->dstUC, 6, 1, file);
         fread(ethernetFrame->srcUC, 6, 1, file);
         fread(ethernetFrame->nxtUC, 2, 1, file);
@@ -236,10 +238,5 @@ void printMeditrik(struct frame* frmPtr, const char * fileName){
 		fprintf(stderr, "ERROR: Invalid message type!");
 		exit(0);
 	}
-
-	
-	
-	
-	
 	fclose(file);
 }

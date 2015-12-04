@@ -80,19 +80,19 @@ int setHeader(FILE* file, struct frame* frmPtr){
 	//	fprintf(stdout, "Unsupported version Expected version 1\n");
 		return -1;
 	} 																		// actually set the version in a header
-	if( (frmPtr->medPtr.seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
+	if( (signed int) (frmPtr->medPtr.seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
 	//	fprintf(stdout, "Bad Sequence number\n");
 		return -2;
-	}
-	if( (frmPtr->medPtr.srcIN = (int) checkLine(file, "From: ")) < 1 ){
+	} 
+	if( (signed int) (frmPtr->medPtr.srcIN = (int) checkLine(file, "From: ")) < 1 ){
 	//	fprintf(stdout, "Bad From\n");
 		return -3;
-	}
-	if ( (frmPtr->medPtr.dstIN = (int) checkLine(file, "To: ")) < 1 ){
+	}// printf("%d\n",frmPtr->medPtr.srcIN);
+	if ( (signed int) (frmPtr->medPtr.dstIN = (int) checkLine(file, "To: ")) < 1 ){
 	//	fprintf(stdout, "Bad To\n");
 		return-4;
 	}
-	printf("%d\n",frmPtr->medPtr.srcIN);
+	//printf("%d\n",frmPtr->medPtr.srcIN);
 
 	frmPtr->medPtr.seqIN = htons(frmPtr->medPtr.seqIN);
 	frmPtr->medPtr.srcIN = htonl(frmPtr->medPtr.srcIN);
@@ -106,7 +106,6 @@ int setHeader(FILE* file, struct frame* frmPtr){
 			|| !strcmp(array, "Omo")){
 		setCommand( file, frmPtr);
 	} else if( !strcmp( array, "Mes")){
-		
 		setMessage(file, frmPtr); // need to pass file pointer to get message
 	} else if( !strcmp( array, "Lat")){
 		setGps(file, frmPtr);
