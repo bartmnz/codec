@@ -57,16 +57,19 @@ void getMeditrikHeader(FILE* file, struct frame* frmPtr){
 
 void getCommand(FILE* file, struct frame* frmPtr){
 	fread(frmPtr->cmdPtr.comUC, 2, 1, file);
-	int szData = ntohs(frmPtr->medPtr.lenIN);
+	int szData = ntohs(frmPtr->medPtr.lenIN)-1;
+//	printf("%d\n", szData);
 	if(szData == 16)fread(frmPtr->cmdPtr.parUC, 2, 1, file);
-	char* command[8] = {"GET_STATUS", "SET_GLUCOSE", "GET_GPS", 
-			"SET_CAPSAICIN","RESERVED", "SET_OMORFINE",
-			"RESERVED",  "REPEAT"};
-	char* parameter[9] = {"","Glucose","", "Capsaicin", "",
-				 "Omorfine","","SequenceID"};
-	int index = ntohs(frmPtr->cmdPtr.comIN);
-	printf("%s\n", command[index]);
-	if(szData == 16) printf("%s=%d", parameter[index], ntohs(frmPtr->cmdPtr.parIN));
+	char* command[8] = {"GET STATUS", "Glucose", "GET GPS", 
+			"Capsaicin","RESERVED", "Omorfine",
+			"RESERVED",  "SequenceID"};
+	//char* parameter[9] = {"","Glucose","", "Capsaicin", "",
+	//			 "Omorfine","",""};
+	int index = (ntohs(frmPtr->cmdPtr.comIN)-1);
+//	printf("%s\n", command[index]);
+	printf("%s", command[index]);
+	if(szData == 16) printf("=%d\n", ntohs(frmPtr->cmdPtr.parIN));
+	else printf("\n");
 
 }
 
@@ -95,9 +98,9 @@ void getGps(FILE* file, struct frame* frmPtr){
 	fread(frmPtr->gpsPtr.altiUC, 4, 1, file);
 
 
-	printf("Latitude : %.9f\n", frmPtr->gpsPtr.latiDB);
+	printf("Latitude: %.9f\n", frmPtr->gpsPtr.latiDB);
 	printf("Longitude: %.9f\n", frmPtr->gpsPtr.longDB);
-	printf("Altitude : %.0f ft. \n", frmPtr->gpsPtr.altiDB * 6); // stored as fathoms 
+	printf("Altitude: %.0f ft. \n", frmPtr->gpsPtr.altiDB * 6); // stored as fathoms 
 
 }
 
@@ -106,7 +109,7 @@ void getMessage(FILE* file, struct frame* frmPtr){
 	int size = ntohs(frmPtr->medPtr.lenIN);
 	fread(frmPtr->msgPtr->message, size-12, 1, file);
 	frmPtr->msgPtr->message[size-1] = '\n';
-	fprintf(stdout,"%s%c", frmPtr->msgPtr->message, zero);
+	fprintf(stdout,"Message: %s%c\n", frmPtr->msgPtr->message, zero);
 
 }
 

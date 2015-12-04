@@ -21,13 +21,21 @@ void setLens(struct frame*, int);
 void setLocal(struct frame*);
 void setGlobal(const char*);
 
-int main( void){
+int main( int argc, const char* argv[]){
 	FILE* file;
-	if(!(file = fopen("test.txt", "r"))) exit(0);
+	if(argc != 3){ // set errno goto problems
+		fprintf(stderr,"Usage = encoder (FILE TO READ) (FILE TO WRITE)\n");
+		exit(0);
+	};
+	if(!(file = fopen(argv[1], "r"))){
+		fprintf(stderr,"ERROR: could not open file\n");
+		exit(0);
+		//problems(file);
+	}
 	
 	long position = ftell(file); 
 	char temp;
-	setGlobal("check.txt");
+	setGlobal(argv[2]);
 	
 	struct frame* frmPtr = malloc(sizeof(struct frame));
 	frmPtr->msgPtr = malloc(1478);
@@ -35,9 +43,11 @@ int main( void){
 	while( (temp = fgetc(file)) != EOF){
 		memset(frmPtr, 0, sizeof(struct frame)- sizeof(void*));
 		memset(frmPtr->msgPtr, 0, 1478);
-		fseek(file, position, SEEK_SET);
+		if (temp != '\n'){
+			fseek(file, position, SEEK_SET);
+		} 
 		if(!setHeader(file, frmPtr)){
-			printMeditrik(frmPtr, "check.txt");
+			printMeditrik(frmPtr, argv[2]);
 			position = ftell(file);
 		} else break;
 	}
@@ -59,7 +69,7 @@ double checkLine(FILE* file, const char * text){
 	}
 	if (!((long int)array == (long int)strstr(array, text))){
 		fprintf(stdout,"Invalid line: expected %s HAVE %s \n", text, array);
-		return -1;
+		return -2;
 		//exit(0);
 	}
 	// need to implement more error checking to ensure that strings are not evaluated as a number, eg. allow for a zero value that is not abc
@@ -103,16 +113,16 @@ int setHeader(FILE* file, struct frame* frmPtr){
 	fgets(array, 4, file); 		
 	
 	if( !strcmp(array, "GET") || !strcmp(array, "Glu") || !strcmp(array, "Cap") 
-			|| !strcmp(array, "Omo")){
+			|| !strcmp(array, "Omo") || !strcmp(array, "Seq")){
 		setCommand( file, frmPtr);
 	} else if( !strcmp( array, "Mes")){
-		setMessage(file, frmPtr); // need to pass file pointer to get message
+		setMessage(file, frmPtr); 
 	} else if( !strcmp( array, "Lat")){
 		setGps(file, frmPtr);
 	} else if( !strcmp( array, "Bat")){
 		setStatus(file, frmPtr);
 	} else {
-		printf("Invalid input\n");
+		printf("%s Invalid input\n", array);
 		return -5;
 	}
 	
@@ -265,7 +275,7 @@ void setLocal( struct frame* frmPtr){
 
 void setGlobal( const char* fileName){
 	FILE* file;
-	if(! (file = fopen(fileName, "ab"))){
+	if(! (file = fopen(fileName, "wb"))){
 		exit(0);
 	};
 	struct globalHeader global = {.magicIN = 2712847316, .magVerSH = 2, .minVerSH = 4};
