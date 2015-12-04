@@ -37,7 +37,7 @@ int main(int argc, const char* argv[]){
 	frmPtr->msgPtr = malloc(1477);
 	while( ((temp = fgetc(file)) != EOF) && !quit){
 		memset(frmPtr, 0, sizeof(struct frame)- sizeof(void*));
-		memset(frmPtr->msgPtr, 0, 1478);
+		memset(frmPtr->msgPtr, 0, 1477);
 		fseek(file, position, SEEK_SET);
 		quit = stripHeaders(file, frmPtr);
 		getMeditrikHeader(file, frmPtr);

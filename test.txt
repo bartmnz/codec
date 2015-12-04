@@ -28,3 +28,12 @@ Sequence: 109
 From: 1234
 To: 6600
 Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000
+Omorfine: aaa
