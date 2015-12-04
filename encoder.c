@@ -63,7 +63,7 @@ void makeHeader(FILE* file){
 double checkLine(FILE* file, const char * text){
 	char temp[MAXSIZE], *end, array[MAXSIZE], *num;
 	if(fgets(array, sizeof(array), file) == NULL){
-		fprintf(stdout,"ERROR: nothing to read!!");
+		//fprintf(stdout,"ERROR: nothing to read!!");
 		return -1;
 		//exit(0);
 	}
@@ -188,17 +188,18 @@ void setCommand( FILE* file, struct frame* frmPtr){
 	bool hasPara = false;
 	if (!strcmp(array, " ST")){ // GET STATUS
 		frmPtr->cmdPtr.comIN = htons(1);
-		fgets(array, MAXSIZE, file);
 	} else	if(!strcmp(array, "cos")){ // Glucose
 		frmPtr->cmdPtr.comIN = htons(2);
 	//	printf("%s\n", array);
-		frmPtr->cmdPtr.parIN = htons(checkLine(file, "e="));
+		unsigned short size = checkLine(file, "e=");
+		printf("size is %d\n sizeof = %d\n", size, (int) sizeof(size));
+		frmPtr->cmdPtr.parIN = htons(size);
 		hasPara = true;
 	} else if (!strcmp(array, " GP")){ // GET GPS
 		frmPtr->cmdPtr.comIN = htons(3);
 	} else if(!strcmp(array, "sai")){ // Capsaicin
 		frmPtr->cmdPtr.comIN = htons(4);
-		frmPtr->cmdPtr.parIN = htons(checkLine(file, "cin="));
+		frmPtr->cmdPtr.parIN = htons((int)checkLine(file, "cin="));
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
@@ -206,18 +207,18 @@ void setCommand( FILE* file, struct frame* frmPtr){
 	}*/ 
 	else if(!strcmp(array, "rfi")){ // Omorfine
 		frmPtr->cmdPtr.comIN = htons(5);
-		frmPtr->cmdPtr.parIN = checkLine(file, "ne=");
+		frmPtr->cmdPtr.parIN = htons((int)checkLine(file, "ne="));
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
 		frmPtr->cmdPtr.comIN = htons(6);
 	}*/ 
-	else if(!strcmp(array, "EAT")){ // REPEAT
+	else if(!strcmp(array, "uen")){ // REPEAT
 		frmPtr->cmdPtr.comIN = htons(7);
-		frmPtr->cmdPtr.parIN = checkLine(file, "=");
+		frmPtr->cmdPtr.parIN = checkLine(file, "ce=");
 		hasPara = true;
 	}
-	
+	fgets(array, MAXSIZE, file); 			//Move file pointer to end of line
 	frmPtr->medPtr.typeIN = 1; // need this here
 	if (hasPara){
 		setLens(frmPtr, 16);

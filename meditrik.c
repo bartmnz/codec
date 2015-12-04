@@ -57,7 +57,7 @@ void getMeditrikHeader(FILE* file, struct frame* frmPtr){
 
 void getCommand(FILE* file, struct frame* frmPtr){
 	fread(frmPtr->cmdPtr.comUC, 2, 1, file);
-	int szData = ntohs(frmPtr->medPtr.lenIN)-1;
+	int szData = ntohs(frmPtr->medPtr.lenIN);		//had -1
 //	printf("%d\n", szData);
 	if(szData == 16)fread(frmPtr->cmdPtr.parUC, 2, 1, file);
 	char* command[8] = {"GET STATUS", "Glucose", "GET GPS", 

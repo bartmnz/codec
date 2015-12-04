@@ -1,0 +1,38 @@
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+GET STATUS
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Latitude: 85
+Longitude: 56
+Altitude: 12
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Message: Hello World        EOF '\0'
+more stuff here cause i can
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234

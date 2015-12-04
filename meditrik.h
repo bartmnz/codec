@@ -174,11 +174,11 @@ struct status{
 struct command{
 	union{
 		unsigned char comUC[2];
-		int comIN;
+		unsigned short comIN;
 	};
 	union{
 		unsigned char parUC[2];
-		int parIN;
+		unsigned short parIN;
 	};
 };
 
