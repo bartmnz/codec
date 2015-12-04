@@ -1,6 +1,6 @@
 Version: 1
-Sequence: 1092
-From: 1234
+Sequence: 109
+From: 123422
 To: 6600
 Latitude: 85.97 deg. N
 Longitude: 55.222222 deg. E

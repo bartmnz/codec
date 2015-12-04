@@ -36,8 +36,8 @@ void getMeditrikHeader(FILE* file, struct frame* frmPtr){
 		frmPtr->medPtr.dstIN = ntohl(frmPtr->medPtr.dstIN);
 //	}
 	printf("Sequence: %d\n",frmPtr->medPtr.seqIN);
-	printf("From:  %u\n", frmPtr->medPtr.srcIN);
-	printf("To:  %d\n", frmPtr->medPtr.dstIN);
+	printf("From: %u\n", frmPtr->medPtr.srcIN);
+	printf("To: %d\n", frmPtr->medPtr.dstIN);
 
 
 	if(frmPtr->medPtr.typeIN == 0){

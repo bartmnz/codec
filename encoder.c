@@ -113,25 +113,28 @@ double checkLine(FILE* file, const char * text){
 }
 
 int setHeader(FILE* file, struct frame* frmPtr){
-//	struct frame* frmPtr = malloc(sizeof(struct frame));
-//	printf("%ld\n", (long) &frmPtr->msgPtr->len);
-	if( (frmPtr->medPtr.verIN = (int) checkLine(file, "Version: ")) != 1){
-	//	fprintf(stdout, "Unsupported version Expected version 1\n");
+
+	int temp;
+	temp = (int) checkLine(file, "Version: ");
+	if( temp != 1){
+		fprintf(stdout, "ERROR: Unsupported version Expected version 1\n");
 		return -1;
-	} 																		// actually set the version in a header
-	if( (signed int) (frmPtr->medPtr.seqIN = (int) checkLine(file, "Sequence: ")) < 1 ){
-	//	fprintf(stdout, "Bad Sequence number\n");
+	} else frmPtr->medPtr.verIN = temp;	 // actually set the version in a header
+	temp = (int) checkLine(file, "Sequence: ");
+	if( temp < 1 || temp > 511){
+		fprintf(stdout, "ERROR: Bad Sequence number\n");
 		return -2;
-	} 
-	if( (signed int) (frmPtr->medPtr.srcIN = (int) checkLine(file, "From: ")) < 1 ){
-	//	fprintf(stdout, "Bad From\n");
+	} else frmPtr->medPtr.seqIN = temp;
+	temp = (int) checkLine(file, "From: ");
+	if( temp < 1 || temp > 65535){
+		fprintf(stdout, "ERROR: Bad From number\n");
 		return -3;
-	}// printf("%d\n",frmPtr->medPtr.srcIN);
-	if ( (signed int) (frmPtr->medPtr.dstIN = (int) checkLine(file, "To: ")) < 1 ){
-	//	fprintf(stdout, "Bad To\n");
+	} else frmPtr->medPtr.srcIN = temp;
+	temp = (int) checkLine(file, "To: ");
+	if ( temp < 1 || temp > 65535){
+		fprintf(stdout, "ERROR: Bad To number\n");
 		return-4;
-	}
-	//printf("%d\n",frmPtr->medPtr.srcIN);
+	} else frmPtr->medPtr.dstIN = temp;
 
 	frmPtr->medPtr.seqIN = htons(frmPtr->medPtr.seqIN);
 	frmPtr->medPtr.srcIN = htonl(frmPtr->medPtr.srcIN);
@@ -154,12 +157,9 @@ int setHeader(FILE* file, struct frame* frmPtr){
 		printf("%s Invalid input\n", array);
 		return -5;
 	}
-	
-
 	setLocal(frmPtr);
 	return 0;
 
-//	free(frmPtr);
 }
 
 
