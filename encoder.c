@@ -16,7 +16,7 @@ void setMessage(FILE*, struct frame*);
 double checkLine(FILE*, const char*);
 void setGps(FILE*, struct frame*);
 void setCommand( FILE*, struct frame*);
-void setStatus(FILE*, struct frame*);
+int setStatus(FILE*, struct frame*);
 void setDefaults(struct frame*);
 void setLens(struct frame*, int);
 void setLocal(struct frame*);
@@ -81,8 +81,13 @@ double checkLine(FILE* file, const char * text){
 			num = strtok(temp, "=");
 	}
 	num = strtok(NULL, " ");
-//	printf("%s\n", num);
+	end = num;
 	double value = strtod(num, &end);
+//	printf("%u\n", (unsigned char)*end);
+	if( end == num || !(*end == '\n' || *end == '%' || *end == ' ' || *end == 0)){
+		fprintf(stderr, "ERROR: must input a number HAVE: %s\n", temp);
+		return -1;
+	}
 	if( !strcmp(text, "itude: ")){ // if it is latitude or longitude
 		strtok(temp, ".");
 		strtok(NULL, ".");
@@ -144,7 +149,7 @@ int setHeader(FILE* file, struct frame* frmPtr){
 	} else if( !strcmp( array, "Lat")){
 		setGps(file, frmPtr);
 	} else if( !strcmp( array, "Bat")){
-		setStatus(file, frmPtr);
+		return setStatus(file, frmPtr);
 	} else {
 		printf("%s Invalid input\n", array);
 		return -5;
@@ -253,15 +258,31 @@ void setCommand( FILE* file, struct frame* frmPtr){
 	setDefaults(frmPtr);
 }
 
-void setStatus(FILE* file, struct frame* frmPtr){
-	frmPtr->stsPtr.batDB = checkLine(file, "tery: ");
-	frmPtr->stsPtr.gluIN = htons(checkLine(file, "Glucose: "));
-	
-	frmPtr->stsPtr.capIN = htons(checkLine(file, "Capsaicin: "));
-	
-	frmPtr->stsPtr.omoIN = htons(checkLine(file, "Omorfine: "));
+int setStatus(FILE* file, struct frame* frmPtr){
+	double temp;
+	temp = checkLine(file, "tery: ");
+	if (temp < 0){
+		fprintf(stderr, "ERROR: Battery cannot be a negative value\n");
+		return 1;
+	} else frmPtr->stsPtr.batDB = temp;
+	temp = checkLine(file, "Glucose: ");
+	if (temp < 0){
+		fprintf(stderr, "ERROR: Glucose cannot be a negative value\n");
+		return 1;
+	} else frmPtr->stsPtr.gluIN = htons(temp);
+	temp = checkLine(file, "Capsaicin: ");
+	if (temp < 0){
+		fprintf(stderr, "ERROR: Capsaicin cannot be a negative value\n");
+		return 1;
+	} else frmPtr->stsPtr.capIN = htons(temp);
+	temp = checkLine(file, "Omorfine: ");
+	if (temp < 0){
+		fprintf(stderr, "ERROR: Omorfine cannot be a negative value\n");
+		return 1;
+	} else frmPtr->stsPtr.omoIN = htons(temp);
 	setLens(frmPtr, 28);
 	setDefaults(frmPtr);
+	return 0;
 	
 }
 

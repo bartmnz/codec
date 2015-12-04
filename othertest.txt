@@ -1,8 +1,7 @@
 Version: 1
-Sequence: 109
+Sequence: 1092
 From: 1234
 To: 6600
-Battery: 97.25%
-Glucose: 600
-Capsaicin: 200
-Omorfine: 100
+Latitude: 85.97 deg. N
+Longitude: 55.222222 deg. E
+Altitude: 55 ft
