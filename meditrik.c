@@ -82,7 +82,7 @@ void getStatus(FILE* file, struct frame* frmPtr){
 	fread(frmPtr->stsPtr.capUC, 2, 1, file);
 	fread(frmPtr->stsPtr.omoUC, 2, 1, file);
 	
-	printf("Battery: %.2f%% \n", 100* frmPtr->stsPtr.batDB);
+	printf("Battery: %.2f%% \n", frmPtr->stsPtr.batDB);
 	printf("Glucose: %d\n", ntohs(frmPtr->stsPtr.gluIN));
 	printf("Capsaicin: %d\n", ntohs(frmPtr->stsPtr.capIN));
 	printf("Omorfine: %d\n", ntohs(frmPtr->stsPtr.omoIN));

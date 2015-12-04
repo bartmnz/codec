@@ -255,17 +255,14 @@ void setCommand( FILE* file, struct frame* frmPtr){
 
 void setStatus(FILE* file, struct frame* frmPtr){
 	frmPtr->stsPtr.batDB = checkLine(file, "tery: ");
-//	printf("%f\n", frmPtr->stsPtr.batDB );
 	frmPtr->stsPtr.gluIN = htons(checkLine(file, "Glucose: "));
 	
 	frmPtr->stsPtr.capIN = htons(checkLine(file, "Capsaicin: "));
 	
 	frmPtr->stsPtr.omoIN = htons(checkLine(file, "Omorfine: "));
-	printHeader(frmPtr->stsPtr.batUC, 8);
 	setLens(frmPtr, 28);
 	setDefaults(frmPtr);
 	
-//	printf("Status Successful\n");
 }
 
 void setDefaults(struct frame* frmPtr){
