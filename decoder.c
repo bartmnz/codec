@@ -31,17 +31,22 @@ int main(int argc, const char* argv[]){
 	}
 	stripGlobal(file);
 	bool quit = false;
-	while (!quit){
-		struct frame* frmPtr = malloc(sizeof(struct frame));
-		frmPtr->msgPtr = malloc(1477);
-//		memset(frmPtr, 0, sizeof(struct frame));
-//		memset(frmPtr->msgPtr, 0, 1477);
+	long position = ftell(file); 
+	char temp;
+	struct frame* frmPtr = malloc(sizeof(struct frame));
+	frmPtr->msgPtr = malloc(1477);
+	while( ((temp = fgetc(file)) != EOF) && !quit){
+		memset(frmPtr, 0, sizeof(struct frame)- sizeof(void*));
+		memset(frmPtr->msgPtr, 0, 1478);
+		fseek(file, position, SEEK_SET);
 		quit = stripHeaders(file, frmPtr);
 		getMeditrikHeader(file, frmPtr);
 		fprintf(stdout,"\n");
-		free(frmPtr->msgPtr);
-		free(frmPtr);
+		position = ftell(file);
+	
 	}
+	free(frmPtr->msgPtr);
+	free(frmPtr);
 	fclose(file);
 }
 
