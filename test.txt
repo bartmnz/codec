@@ -3,3 +3,28 @@ Sequence: 109
 From: 1234
 To: 6600
 Glucose=91
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Message: Hello World        EOF '\0'
+more stuff here cause i can
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234

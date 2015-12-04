@@ -4,6 +4,7 @@
 #include <arpa/inet.h>
 #include <unistd.h>
 #include <errno.h>
+#include <ctype.h>
 
 
 #include "meditrik.h"
@@ -80,7 +81,30 @@ double checkLine(FILE* file, const char * text){
 			num = strtok(temp, "=");
 	}
 	num = strtok(NULL, " ");
-	return strtod(num, &end);
+//	printf("%s\n", num);
+	double value = strtod(num, &end);
+	if( !strcmp(text, "itude: ")){ // if it is latitude or longitude
+		strtok(temp, ".");
+		strtok(NULL, ".");
+		num = strtok(NULL, " ");
+		if('S' == toupper(num[0])){
+			value = 0 - value;
+		}else if ('N' != toupper(num[0])){
+			fprintf(stderr, "ERROR: Latitude must be North or South\n");
+			return -1;
+		}
+	} else if (!strcmp(text, "Longitude: ")){
+		strtok(temp, ".");
+		strtok(NULL, ".");
+		num =strtok(NULL, " ");
+		if('E' == toupper(num[0])){
+			value = 0 - value;
+		}else if ('W' != toupper(num[0])){
+			fprintf(stderr, "ERROR: Longitude must be East or West\n");
+			return -1;
+		}
+	}
+	return value;
 }
 
 int setHeader(FILE* file, struct frame* frmPtr){
@@ -190,16 +214,15 @@ void setCommand( FILE* file, struct frame* frmPtr){
 		frmPtr->cmdPtr.comIN = htons(1);
 	} else	if(!strcmp(array, "cos")){ // Glucose
 		frmPtr->cmdPtr.comIN = htons(2);
-	//	printf("%s\n", array);
 		unsigned short size = checkLine(file, "e=");
-		printf("size is %d\n sizeof = %d\n", size, (int) sizeof(size));
 		frmPtr->cmdPtr.parIN = htons(size);
 		hasPara = true;
 	} else if (!strcmp(array, " GP")){ // GET GPS
 		frmPtr->cmdPtr.comIN = htons(3);
 	} else if(!strcmp(array, "sai")){ // Capsaicin
 		frmPtr->cmdPtr.comIN = htons(4);
-		frmPtr->cmdPtr.parIN = htons((int)checkLine(file, "cin="));
+		unsigned short size = checkLine(file, "cin=");
+		frmPtr->cmdPtr.parIN = htons(size);
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
@@ -207,7 +230,8 @@ void setCommand( FILE* file, struct frame* frmPtr){
 	}*/ 
 	else if(!strcmp(array, "rfi")){ // Omorfine
 		frmPtr->cmdPtr.comIN = htons(5);
-		frmPtr->cmdPtr.parIN = htons((int)checkLine(file, "ne="));
+		unsigned short size = checkLine(file, "ne=");
+		frmPtr->cmdPtr.parIN = htons(size);
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
@@ -215,7 +239,8 @@ void setCommand( FILE* file, struct frame* frmPtr){
 	}*/ 
 	else if(!strcmp(array, "uen")){ // REPEAT
 		frmPtr->cmdPtr.comIN = htons(7);
-		frmPtr->cmdPtr.parIN = checkLine(file, "ce=");
+		unsigned short size = checkLine(file, "ce=");
+		frmPtr->cmdPtr.parIN = htons(size);
 		hasPara = true;
 	}
 	fgets(array, MAXSIZE, file); 			//Move file pointer to end of line

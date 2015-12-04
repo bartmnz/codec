@@ -2,6 +2,7 @@
 #include <string.h>
 #include <stdlib.h>
 #include <arpa/inet.h>
+#include <math.h>
 
 #include "meditrik.h"
 
@@ -97,9 +98,11 @@ void getGps(FILE* file, struct frame* frmPtr){
 	fread(frmPtr->gpsPtr.latiUC, 8, 1, file);
 	fread(frmPtr->gpsPtr.altiUC, 4, 1, file);
 
-
-	printf("Latitude: %.9f\n", frmPtr->gpsPtr.latiDB);
-	printf("Longitude: %.9f\n", frmPtr->gpsPtr.longDB);
+	char direction;
+	frmPtr->gpsPtr.latiDB > 0 ? (direction = 'N') : (direction = 'S');
+	printf("Latitude: %.9f deg. %c\n", fabs(frmPtr->gpsPtr.latiDB), direction);
+	frmPtr->gpsPtr.longDB > 0 ? (direction = 'W') : (direction = 'E');
+	printf("Longitude: %.9f deg. %c\n", fabs(frmPtr->gpsPtr.longDB), direction);
 	printf("Altitude: %.0f ft. \n", frmPtr->gpsPtr.altiDB * 6); // stored as fathoms 
 
 }
