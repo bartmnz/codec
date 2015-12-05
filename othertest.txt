@@ -1,7 +1,19 @@
 Version: 1
 Sequence: 109
-From: 123422
+From: 12342
 To: 6600
-Latitude: 85.97 deg. N
-Longitude: 55.222222 deg. E
-Altitude: 55 ft
+Latitude: 88.97 deg. N
+Longitude: 179.999999999 deg. E
+Altitude: -555 ft
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234

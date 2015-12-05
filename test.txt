@@ -9,9 +9,7 @@ Sequence: 109
 From: 1234
 To: 6600
 Message: Hello World        EOF '\0'
-more stuff here cause i can
-
-Version: 1
+more stuff here cause i caVersion: 1
 Sequence: 109
 From: 1234
 To: 6600
@@ -35,5 +33,680 @@ From: 1234
 To: 6600
 Battery: 97.25%
 Glucose: 60a0
-Capsaicin: 200000000
-Omorfine: aaa
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl caVersion: 1
+Sequence: 109
+From: 1234
+To: 6600
+Capsaicin=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Omorfine=100
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Sequence=1234
+
+Version: 1
+Sequence: 109
+From: 1234
+To: 6600
+Battery: 97.25%
+Glucose: 60a0
+Capsaicin: 200000000sdaf;lfasdlkasdf
+Omorfine: aaaksdfaklfkl

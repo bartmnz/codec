@@ -12,10 +12,10 @@
 
 
 int setHeader(FILE*, struct frame*);
-void setMessage(FILE*, struct frame*);
+int setMessage(FILE*, struct frame*);
 double checkLine(FILE*, const char*);
-void setGps(FILE*, struct frame*);
-void setCommand( FILE*, struct frame*);
+int setGps(FILE*, struct frame*);
+int setCommand( FILE*, struct frame*);
 int setStatus(FILE*, struct frame*);
 void setDefaults(struct frame*);
 void setLens(struct frame*, int);
@@ -146,13 +146,21 @@ int setHeader(FILE* file, struct frame* frmPtr){
 	
 	if( !strcmp(array, "GET") || !strcmp(array, "Glu") || !strcmp(array, "Cap") 
 			|| !strcmp(array, "Omo") || !strcmp(array, "Seq")){
-		setCommand( file, frmPtr);
+		if(setCommand( file, frmPtr)){
+			return -1;
+		}
 	} else if( !strcmp( array, "Mes")){
-		setMessage(file, frmPtr); 
+		if (setMessage(file, frmPtr)){
+			return -1;
+		}
 	} else if( !strcmp( array, "Lat")){
-		setGps(file, frmPtr);
+		if (setGps(file, frmPtr)){
+			return -1;
+		}
 	} else if( !strcmp( array, "Bat")){
-		return setStatus(file, frmPtr);
+		if(setStatus(file, frmPtr)){
+			return -1;
+		}
 	} else {
 		printf("%s Invalid input\n", array);
 		return -5;
@@ -164,21 +172,21 @@ int setHeader(FILE* file, struct frame* frmPtr){
 
 
 
-void setMessage(FILE* file, struct frame* frmPtr){
+int setMessage(FILE* file, struct frame* frmPtr){
 	char array[7];
 	
 	fgets(array, sizeof(array), file);
 	if(!((long int) &*array == (long int)strstr(array, "sage: "))){
 		printf("Invalid Line: expected Message: \n Have: %s\n", array);
-		return;
+		return -1;
 	}
 	long position = ftell(file);
 	int temp, count = 0;
 	while( (temp = fgetc(file)) != '\0' && temp != EOF){ 
 		count++;
 		if( count == 1478){
-			fprintf(stderr, "ERROR: message is too large, max size is 1477");
-			exit(0);
+			fprintf(stderr, "ERROR: message is too large, max size is 1477\n");
+			return -1;
 		}
 	}
 	
@@ -193,15 +201,33 @@ void setMessage(FILE* file, struct frame* frmPtr){
 	setLens(frmPtr, 12 + frmPtr->msgPtr->len);
 	
 	setDefaults(frmPtr);
+	return 0;
 }
 
-void setGps(FILE* file, struct frame* frmPtr){
-	frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
-	frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
-	frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
+int setGps(FILE* file, struct frame* frmPtr){
+	double temp;
+	temp = checkLine(file, "itude: ");
+	if (temp < -90 || temp > 90){
+		fprintf(stderr, "ERROR: invalid latitude\n");
+		return -1;
+	}else frmPtr->gpsPtr.latiDB = temp;
+	temp = checkLine(file, "Longitude: ");
+	if (temp < -180 || temp > 180){
+		fprintf(stderr, "ERROR: invalid longitude\n");
+		return -1;
+	}else frmPtr->gpsPtr.longDB = temp;
+	float alt = ((float) checkLine(file, "Altitude: "))/6;
+	if (alt < -6705 || alt > 4839){ // ma is heiht of mt everest min is deepest depth every achieved
+		fprintf(stderr, "ERROR: invalid altitude\n");
+		return -1;
+	}else frmPtr->gpsPtr.altiDB = alt;
+//	frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
+///	frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
+//	frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
 	frmPtr->medPtr.typeIN = 2;
 	setLens(frmPtr, 32);
 	setDefaults(frmPtr);
+	return 0;
 }
 
 void setLens( struct frame* frmPtr, int len){
@@ -211,7 +237,7 @@ void setLens( struct frame* frmPtr, int len){
 	frmPtr->udpPtr.lenSH = htons(len + 8);
 }
 
-void setCommand( FILE* file, struct frame* frmPtr){
+int setCommand( FILE* file, struct frame* frmPtr){
 	char array [MAXSIZE];
 	fgets(array, 4, file);
 	bool hasPara = false;
@@ -219,33 +245,49 @@ void setCommand( FILE* file, struct frame* frmPtr){
 		frmPtr->cmdPtr.comIN = htons(1);
 	} else	if(!strcmp(array, "cos")){ // Glucose
 		frmPtr->cmdPtr.comIN = htons(2);
-		unsigned short size = checkLine(file, "e=");
-		frmPtr->cmdPtr.parIN = htons(size);
+		int size = checkLine(file, "e=");
+		if(size < 0 || size > 65535){
+			fprintf(stderr, "ERROR: invalid Glucose setting\n");
+			return -1;
+		} 
+		frmPtr->cmdPtr.parIN = htons((unsigned short)size);
 		hasPara = true;
 	} else if (!strcmp(array, " GP")){ // GET GPS
 		frmPtr->cmdPtr.comIN = htons(3);
 	} else if(!strcmp(array, "sai")){ // Capsaicin
 		frmPtr->cmdPtr.comIN = htons(4);
-		unsigned short size = checkLine(file, "cin=");
-		frmPtr->cmdPtr.parIN = htons(size);
+		int size = checkLine(file, "cin=");
+		if(size < 0 || size > 65535){
+			fprintf(stderr, "ERROR: invalid Capsaicin setting\n");
+			return -1;
+		} 
+		frmPtr->cmdPtr.parIN = htons((unsigned short)size);
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
-		frmPtr->cmdPtr.comIN = htons(4);
+		frmPtr->cmdPtr.comIN = htons(5);
 	}*/ 
 	else if(!strcmp(array, "rfi")){ // Omorfine
-		frmPtr->cmdPtr.comIN = htons(5);
-		unsigned short size = checkLine(file, "ne=");
-		frmPtr->cmdPtr.parIN = htons(size);
+		frmPtr->cmdPtr.comIN = htons(6);
+		int size = checkLine(file, "ne=");
+		if(size < 0 || size > 65535){
+			fprintf(stderr, "ERROR: invalid Omorfine setting\n");
+			return -1;
+		} 
+		frmPtr->cmdPtr.parIN = htons((unsigned short)size);
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
-		frmPtr->cmdPtr.comIN = htons(6);
+		frmPtr->cmdPtr.comIN = htons(7);
 	}*/ 
 	else if(!strcmp(array, "uen")){ // REPEAT
-		frmPtr->cmdPtr.comIN = htons(7);
-		unsigned short size = checkLine(file, "ce=");
-		frmPtr->cmdPtr.parIN = htons(size);
+		frmPtr->cmdPtr.comIN = htons(8);
+		int size = checkLine(file, "ce=");
+		if(size < 0 || size > 65535){
+			fprintf(stderr, "ERROR: invalid Sequence\n");
+			return -1;
+		} 
+		frmPtr->cmdPtr.parIN = htons((unsigned short)size);
 		hasPara = true;
 	}
 	fgets(array, MAXSIZE, file); 			//Move file pointer to end of line
@@ -256,6 +298,7 @@ void setCommand( FILE* file, struct frame* frmPtr){
 		setLens(frmPtr, 14);
 	}
 	setDefaults(frmPtr);
+	return 0;
 }
 
 int setStatus(FILE* file, struct frame* frmPtr){
