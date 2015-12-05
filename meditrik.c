@@ -92,7 +92,7 @@ void getMessage(FILE* file, struct frame* frmPtr){
 	int size = ntohs(frmPtr->medPtr.lenIN);
 	fread(frmPtr->msgPtr->message, size-12, 1, file);
 	frmPtr->msgPtr->message[size-1] = '\n';
-	fprintf(stdout,"Message: %s%c\n", frmPtr->msgPtr->message, zero);
+	fprintf(stdout,"Message: %s%c", frmPtr->msgPtr->message, zero);
 
 }
 

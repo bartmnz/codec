@@ -55,6 +55,9 @@ int main( int argc, const char* argv[]){
 	free(frmPtr);
 	fclose(file);
 }
+/*	function compares the first line of file to string text. if a match is 
+	found it will return the number following the match, else -1 or -2 will be returned as errors.
+*/
 
 double checkLine(FILE* file, const char * text){
 	char temp[MAXSIZE], *end, array[MAXSIZE], *num;
@@ -102,6 +105,7 @@ double checkLine(FILE* file, const char * text){
 	}
 	return value;
 }
+
 
 int setHeader(FILE* file, struct frame* frmPtr){
 
