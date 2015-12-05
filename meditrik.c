@@ -63,6 +63,7 @@ void getCommand(FILE* file, struct frame* frmPtr){
 
 void getStatus(FILE* file, struct frame* frmPtr){ 
 	fread(frmPtr->stsPtr.batUC, 8, 1, file);
+	frmPtr->stsPtr.batDB = frmPtr->stsPtr.batDB * 100;
 	fread(frmPtr->stsPtr.gluUC, 2, 1, file);
 	fread(frmPtr->stsPtr.capUC, 2, 1, file);
 	fread(frmPtr->stsPtr.omoUC, 2, 1, file);
@@ -92,7 +93,7 @@ void getMessage(FILE* file, struct frame* frmPtr){
 	int size = ntohs(frmPtr->medPtr.lenIN);
 	fread(frmPtr->msgPtr->message, size-12, 1, file);
 	frmPtr->msgPtr->message[size-1] = '\n';
-	fprintf(stdout,"Message: %s%c", frmPtr->msgPtr->message, zero);
+	fprintf(stdout,"Message: %s%c\n", frmPtr->msgPtr->message, zero);
 
 }
 

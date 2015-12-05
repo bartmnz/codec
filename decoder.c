@@ -39,7 +39,7 @@ int main(int argc, const char* argv[]){
 		fseek(file, position, SEEK_SET);
 		quit = stripHeaders(file, frmPtr);
 		getMeditrikHeader(file, frmPtr);
-		fprintf(stdout,"\n");
+	//	fprintf(stdout,"\n");
 		position = ftell(file);
 	
 	}

@@ -298,7 +298,7 @@ int setStatus(FILE* file, struct frame* frmPtr){
 	if (temp < 0){
 		fprintf(stderr, "ERROR: Battery cannot be a negative value\n");
 		return 1;
-	} else frmPtr->stsPtr.batDB = temp;
+	} else frmPtr->stsPtr.batDB = temp/100;
 	temp = checkLine(file, "Glucose: ");
 	if (temp < 0){
 		fprintf(stderr, "ERROR: Glucose cannot be a negative value\n");
