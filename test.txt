@@ -3,3 +3,12 @@ Sequence: 8
 From: 6600
 To: 1337
 GET STATUS
+
+Version: 1
+Sequence: 404
+From: 1337
+To: 6600
+Battery: 97.25% 
+Glucose: 867
+Capsaicin: 530
+Omorfine: 530

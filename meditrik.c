@@ -55,7 +55,7 @@ void getCommand(FILE* file, struct frame* frmPtr){
 			"Capsaicin","RESERVED", "Omorfine",
 			"RESERVED",  "Sequence"};
 	int index = (ntohs(frmPtr->cmdPtr.comIN));
-	fprintf(stdout,"%s", command[index]);
+	fprintf(stdout,"%s\n", command[index]);
 	if(szData == 16) fprintf(stdout,"=%d\n", ntohs(frmPtr->cmdPtr.parIN));
 	else fprintf(stdout,"\n");
 
