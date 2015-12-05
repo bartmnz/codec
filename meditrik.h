@@ -4,8 +4,6 @@
 #ifndef MEDITRIK_H
 	#define MEDITRIK_H
 
-
-
 struct globalHeader{
 	union{
 		unsigned char magicNum[4];
@@ -20,7 +18,8 @@ struct globalHeader{
 		short minVerSH;
 	};
 	unsigned char zeros[16];
-};	
+};
+
 struct localHeader{
 	unsigned char zeros[8];
 	union{
@@ -72,7 +71,6 @@ struct ipv4Header{
 		unsigned char destinationAddress[4];
 		unsigned int dstLN;
 	};
-	//assign dynamically	unsigned char options[40];
 	union{
 		unsigned char verUC[1];
 		int verSH;
@@ -199,11 +197,8 @@ struct gps{
 
 struct message{
 	int len;
-//	size_t len;
 	unsigned char message[];
 };
-
-
 
 struct frame{
 	struct localHeader locPtr;
@@ -219,16 +214,12 @@ struct frame{
 	struct message* msgPtr;
 };
 
-//int getMessageType(struct meditrik*);
-//int getSequenceID(struct meditrik*);
-//int getVersion(struct meditrik*);
 void getMeditrikHeader(FILE*, struct frame*);
 void getCommand(FILE*, struct frame*);
 void getStatus(FILE*, struct frame*); 
 void getGps(FILE*, struct frame*);
 void getMessage(FILE*, struct frame*); 
 void setEthernetHeader(FILE*, struct ethernetFrame*);
-
 void setIpHeader(FILE*, struct ipv4Header*, int, unsigned char*);
 void printMeditrik(struct frame*, const char *);
 int getIpLen(unsigned char*, int);

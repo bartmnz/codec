@@ -31,7 +31,6 @@ int main( int argc, const char* argv[]){
 	if(!(file = fopen(argv[1], "r"))){
 		fprintf(stderr,"ERROR: could not open file\n");
 		exit(0);
-		//problems(file);
 	}
 	
 	long position = ftell(file); 
@@ -56,25 +55,18 @@ int main( int argc, const char* argv[]){
 	free(frmPtr);
 	fclose(file);
 }
-/*
-void makeHeader(FILE* file){
 
-}
-*/
 double checkLine(FILE* file, const char * text){
 	char temp[MAXSIZE], *end, array[MAXSIZE], *num;
 	if(fgets(array, sizeof(array), file) == NULL){
-		//fprintf(stdout,"ERROR: nothing to read!!");
+		fprintf(stderr, "ERROR: nothing to read\n");
 		return -1;
-		//exit(0);
 	}
 	if (!((long int)array == (long int)strstr(array, text))){
 		fprintf(stdout,"Invalid line: expected %s HAVE %s \n", text, array);
 		return -2;
-		//exit(0);
 	}
-	// need to implement more error checking to ensure that strings are not evaluated as a number, eg. allow for a zero value that is not abc
-	
+
 	strcpy(temp, array);
 	strtok(array, ":");
 	if(!strcmp(array, temp)){
@@ -83,7 +75,6 @@ double checkLine(FILE* file, const char * text){
 	num = strtok(NULL, " ");
 	end = num;
 	double value = strtod(num, &end);
-//	printf("%u\n", (unsigned char)*end);
 	if( end == num || !(*end == '\n' || *end == '%' || *end == ' ' || *end == 0)){
 		fprintf(stderr, "ERROR: must input a number HAVE: %s\n", temp);
 		return -1;
@@ -162,7 +153,7 @@ int setHeader(FILE* file, struct frame* frmPtr){
 			return -1;
 		}
 	} else {
-		printf("%s Invalid input\n", array);
+		fprintf(stderr, "ERROR: %s is not valid input\n", array);
 		return -5;
 	}
 	setLocal(frmPtr);
@@ -177,7 +168,7 @@ int setMessage(FILE* file, struct frame* frmPtr){
 	
 	fgets(array, sizeof(array), file);
 	if(!((long int) &*array == (long int)strstr(array, "sage: "))){
-		printf("Invalid Line: expected Message: \n Have: %s\n", array);
+		fprintf(stderr, "ERROR: Invalid Line: expected Message: \n Have: %s\n", array);
 		return -1;
 	}
 	long position = ftell(file);
@@ -196,7 +187,6 @@ int setMessage(FILE* file, struct frame* frmPtr){
 	fread(frmPtr->msgPtr->message, 1, count, file);
 	
 	fgets(array, sizeof(array), file); // clear out anything left inthe line
-//	printf("%d\n", frmPtr->msgPtr->len);
 	frmPtr->medPtr.typeIN = 3;
 	setLens(frmPtr, 12 + frmPtr->msgPtr->len);
 	
@@ -221,9 +211,6 @@ int setGps(FILE* file, struct frame* frmPtr){
 		fprintf(stderr, "ERROR: invalid altitude\n");
 		return -1;
 	}else frmPtr->gpsPtr.altiDB = alt;
-//	frmPtr->gpsPtr.latiDB = checkLine(file, "itude: ");
-///	frmPtr->gpsPtr.longDB = checkLine(file, "Longitude: ");
-//	frmPtr->gpsPtr.altiDB = ((float) checkLine(file, "Altitude: "))/6;
 	frmPtr->medPtr.typeIN = 2;
 	setLens(frmPtr, 32);
 	setDefaults(frmPtr);
@@ -355,8 +342,6 @@ void setDefaults(struct frame* frmPtr){
 
 void setLocal( struct frame* frmPtr){
 	frmPtr->locPtr.lenIN = ntohs(frmPtr->ipPtr.lenIN) + 14;
-//	printf("%d\n", frmPtr->locPtr.lenIN);
-//	printf("%d\n", ntohs(frmPtr->ipPtr.lenIN));
 	frmPtr->locPtr.nxtLenIN = frmPtr->locPtr.lenIN;
 }
 

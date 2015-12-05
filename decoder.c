@@ -18,16 +18,14 @@ void stripGlobal(FILE*);
 
 
 int main(int argc, const char* argv[]){
-//	bool isLE = checkEndian();
 	FILE* file;
-	if(argc != 2){ // set errno goto problems
+	if(argc != 2){ 
 		fprintf(stderr,"Usage = project (FILENAME)\n");
 		exit(0);
 	};
 	if(!(file = fopen(argv[1], "rb"))){
 		fprintf(stderr,"ERROR: could not open file\n");
 		exit(0);
-		//problems(file);
 	}
 	stripGlobal(file);
 	bool quit = false;
@@ -73,7 +71,6 @@ int stripHeaders(FILE* file, struct frame* frmPtr){
 	setIpHeader(file, &(frmPtr->ipPtr), sizeof_ip, temp);
 	if(frmPtr->ipPtr.nextProtocol[0] != 0x11){
 		fprintf(stderr,"ERROR1\n");
-		//errno = EPROTONOSUPPORT;
 		return 2;
 	}
 	
@@ -89,8 +86,6 @@ void stripGlobal(FILE* file){
 	if (size != 24){
 		fprintf(stderr,"ERROR: Invalid format\n");
 		exit(0);
-	//	errno = EIO;
-	//	problems(file);
 	}
 	unsigned char magicNum[8];
 	unsigned char numMagic[8];
@@ -101,17 +96,6 @@ void stripGlobal(FILE* file){
 	if(!(isLe ||  isBe)){
 		fprintf(stderr,"ERROR: is not a valid PCAP file\n");
 		exit(0);
-	}/*
-	unsigned char linkHeader[4];
-	unsigned char headerLink[4];
-	memcpy(linkHeader, (unsigned char[]) {0x01, 0x00, 0x00, 0x00}, sizeof(linkHeader));
-	memcpy(headerLink, (unsigned char[]) {0x00, 0x00, 0x00, 0x01}, sizeof(headerLink));
-
-	if(( isLe && memcmp(linkHeader, &header[20], 4)) ||
-		(isBe && memcmp(headerLink, &header[20], 4))){
-		fprintf(stderr,"ERROR: is not a valid PCAP file\n");
-		exit(0);
 	}
-	*/
 }
 
