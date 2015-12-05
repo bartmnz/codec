@@ -233,9 +233,9 @@ int setCommand( FILE* file, struct frame* frmPtr){
 	fgets(array, 4, file);
 	bool hasPara = false;
 	if (!strcmp(array, " ST")){ // GET STATUS
-		frmPtr->cmdPtr.comIN = htons(1);
+		frmPtr->cmdPtr.comIN = htons(0);
 	} else	if(!strcmp(array, "cos")){ // Glucose
-		frmPtr->cmdPtr.comIN = htons(2);
+		frmPtr->cmdPtr.comIN = htons(1);
 		int size = checkLine(file, "e=");
 		if(size < 0 || size > 65535){
 			fprintf(stderr, "ERROR: invalid Glucose setting\n");
@@ -244,9 +244,9 @@ int setCommand( FILE* file, struct frame* frmPtr){
 		frmPtr->cmdPtr.parIN = htons((unsigned short)size);
 		hasPara = true;
 	} else if (!strcmp(array, " GP")){ // GET GPS
-		frmPtr->cmdPtr.comIN = htons(3);
+		frmPtr->cmdPtr.comIN = htons(2);
 	} else if(!strcmp(array, "sai")){ // Capsaicin
-		frmPtr->cmdPtr.comIN = htons(4);
+		frmPtr->cmdPtr.comIN = htons(3);
 		int size = checkLine(file, "cin=");
 		if(size < 0 || size > 65535){
 			fprintf(stderr, "ERROR: invalid Capsaicin setting\n");
@@ -256,10 +256,10 @@ int setCommand( FILE* file, struct frame* frmPtr){
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
-		frmPtr->cmdPtr.comIN = htons(5);
+		frmPtr->cmdPtr.comIN = htons(4);
 	}*/ 
 	else if(!strcmp(array, "rfi")){ // Omorfine
-		frmPtr->cmdPtr.comIN = htons(6);
+		frmPtr->cmdPtr.comIN = htons(5);
 		int size = checkLine(file, "ne=");
 		if(size < 0 || size > 65535){
 			fprintf(stderr, "ERROR: invalid Omorfine setting\n");
@@ -269,10 +269,10 @@ int setCommand( FILE* file, struct frame* frmPtr){
 		hasPara = true;
 	} // reserved for future use
 	/*else if (!strcmp(array, " ")){ // 
-		frmPtr->cmdPtr.comIN = htons(7);
+		frmPtr->cmdPtr.comIN = htons(6);
 	}*/ 
 	else if(!strcmp(array, "uen")){ // REPEAT
-		frmPtr->cmdPtr.comIN = htons(8);
+		frmPtr->cmdPtr.comIN = htons(7);
 		int size = checkLine(file, "ce=");
 		if(size < 0 || size > 65535){
 			fprintf(stderr, "ERROR: invalid Sequence\n");
